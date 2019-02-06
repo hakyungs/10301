@@ -10,23 +10,26 @@ data = i.read()
 lines = data.splitlines()
 totalObs = len(lines)
 trueCount = 0
-for (i in in range(totalObs)):
-    if (i==0): continue
-    row = lines.split(",")
-    if (i==1):
-        indicator = row[3]
-    if (indicator == row[3]):
+for j in range(totalObs) :
+    #skip labels
+    if (j==0): continue
+    row = lines[j].split(",")
+    if (j==1):
+        indicator = row[-1]
+    if (indicator == row[-1]):
         trueCount += 1
 
 #calculate entropy
-pTrue = trueCount / totalObs
-pFalse = (totalObs-trueCount) / totalObs
+pTrue = trueCount / (totalObs-1)
+pFalse = (totalObs-trueCount-1) / (totalObs-1)
 entropy = -1 * ((pTrue * math.log(pTrue,2))+(pFalse * math.log(pFalse,2)))
 
 #calculate error
+if (trueCount > (totalObs/2)): error = pFalse
+else: error = pTrue
 
-
-o.write(line + "\n")
+o.write("entropy: %f" % entropy + "\n")
+o.write("error: %f" % error)
 
 i.close()
 o.close()
