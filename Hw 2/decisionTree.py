@@ -27,6 +27,7 @@ class DT_Node(object):
         print("[%d %s /%d %s]" % (self.numPos,att_indicators[-1],
                                   self.numNeg,att_non_indicators[-1]))
         def helper(self,d,att_pass,dir):
+            if (att_pass == None): return None
             if (dir == "l"):
                 print("|  " * d + "%s = %s: [%d %s /%d %s]" %
                       (att_list[att_pass], att_indicators[att_pass],

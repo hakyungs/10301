@@ -25,13 +25,6 @@ pTrue = trueCount / (totalObs-1)
 pFalse = (totalObs-trueCount-1) / (totalObs-1)
 entropy = -1 * ((pTrue * math.log(pTrue,2))+(pFalse * math.log(pFalse,2)))
 
-'''
-if (pTrue == 0 and pFalse == 0): entropy = 0
-elif (pTrue == 0): entropy = -1 * (pFalse * math.log(pFalse,2))
-elif (pFalse ==0): entropy = -1 * (pTrue * math.log(pTrue,2))
-else: entropy = -1 * ((pTrue * math.log(pTrue,2))+(pFalse * math.log(pFalse,2)))
-'''
-
 #calculate error
 if (trueCount > (totalObs/2)): error = pFalse
 else: error = pTrue
