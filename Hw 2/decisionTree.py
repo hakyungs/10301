@@ -11,6 +11,7 @@ LIST OF TOP LEVEL (FINAL) VARS:
     att_indicators - list of "true" values for each attributes
     att_non_indicators - list of "false" values for each attributes
     max_depth - maximum number of splits
+    DT - Decision tree created in main method
 '''
 
 
@@ -170,6 +171,7 @@ def get_MI(td,att):
 
 
 '''
+//TESTED//
 create_DT : returns DT (DT_Node class) for given trainData
 trainData : 2d list [[att1,att2,...],....]
 att_list : 1d list of remaining possible attributes' indices [0,1,2,...]
@@ -201,6 +203,16 @@ def create_DT(td,al,curr_depth):
         return root
 
 
+'''
+traverse : given attribute inputs, follow the DT and output the prediction
+entry : list of attributes + actual result at entry[-1]
+usage: if (traverse(entry) != entry[-1]):
+'''
+
+def traverse(l):
+    attrs = l[:-1]
+
+
 
 if __name__ == "__main__" :
     i1 = sys.argv[1]
@@ -218,6 +230,11 @@ if __name__ == "__main__" :
     metrics_out = open(i6,"w")
 
     data = train_input.read()
+    test_raw = test_input.read()
+
+    ####################################################################
+    # Learning
+    ####################################################################
 
     # format data into 2d list : [[att1,att2,att3,....,y],...]
     # saves list of names of attributes : att_list = [att1,att2,...]
@@ -237,8 +254,36 @@ if __name__ == "__main__" :
                 att_non_indicators[j] = entry[j]
     # len(att_list) since all attributes are available at start
     DT = create_DT(trainData,[i for i in range(len(att_list)-1)],0)
-    print("Done creating")
     DT.pretty_print()
+
+
+    ####################################################################
+    # Test on training data
+    ####################################################################
+
+    train_error_count = 0
+    for entry in trainData:
+        if (traverse(entry) != entry[-1]):
+            train_error_count += 1
+    train_error = train_error_count / len(trainData)
+
+    ####################################################################
+    # Test on testing data
+    ####################################################################
+
+    test_lines = test_raw.splitlines()
+    testData = [-1 for i in range(len(test_lines)-1)]
+    for i in range(len(test_lines)):
+        if (i==0): continue
+        else: testData[i-1] = test_lines[i].split(",")
+
+    test_error_count = 0
+    for entry in testData:
+        if (traverse(entry) != entry[-1]):
+            test_error_count += 1
+    test_error = test_error_count / len(testData)
+
+
 
     train_input.close()
     test_input.close()
