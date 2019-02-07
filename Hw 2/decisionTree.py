@@ -11,7 +11,6 @@ LIST OF TOP LEVEL (FINAL) VARS:
     att_indicators - list of "true" values for each attributes
     att_non_indicators - list of "false" values for each attributes
     max_depth - maximum number of splits
-    DT - Decision tree created in main method
 '''
 
 
@@ -47,11 +46,15 @@ class DT_Node(object):
 
         return None
 
-    def getDepth() :
+    def getDepth(self) :
         if (self.left == None and self.right == None): return 0
         elif (self.left == None) : return (self.right.getDepth()+1)
         elif (self.right == None): return (self.left.getDepth()+1)
         else: return max(self.left.getDepth()+1,self.right.getDepth()+1)
+
+    def getPrediction(self):
+        if (self.numPos > self.numNeg): return att_indicators[-1]
+        else: return att_non_indicators[-1]
 
 '''
 //TESTED//
@@ -205,14 +208,24 @@ def create_DT(td,al,curr_depth):
 
 '''
 traverse : given attribute inputs, follow the DT and output the prediction
+DT : decision tree
 entry : list of attributes + actual result at entry[-1]
 usage: if (traverse(entry) != entry[-1]):
 '''
 
-def traverse(l):
+def traverse(DT,l):
+    if (DT.att == None): return (DT.getPrediction())
+    if (DT.left == None and DT.right == None): return (DT.getPrediction())
     attrs = l[:-1]
+    curr_att = DT.att
+    if (l[curr_att] == att_indicators[curr_att]): #positive = left tree
+        return traverse(DT.left,l)
+    else: #negative = right tree
+        return traverse(DT.right,l)
 
-
+####################################################################
+# Main Function
+####################################################################
 
 if __name__ == "__main__" :
     i1 = sys.argv[1]
@@ -262,8 +275,12 @@ if __name__ == "__main__" :
     ####################################################################
 
     train_error_count = 0
-    for entry in trainData:
-        if (traverse(entry) != entry[-1]):
+    train_prediction_list = [-1 for i in range(len(trainData))]
+    for i in range(len(trainData)):
+        entry = trainData[i]
+        res = traverse(DT,entry)
+        train_prediction_list[i] = res
+        if (res != entry[-1]):
             train_error_count += 1
     train_error = train_error_count / len(trainData)
 
@@ -278,11 +295,27 @@ if __name__ == "__main__" :
         else: testData[i-1] = test_lines[i].split(",")
 
     test_error_count = 0
-    for entry in testData:
-        if (traverse(entry) != entry[-1]):
+    test_prediction_list = [-1 for i in range(len(testData))]
+    for i in range(len(testData)):
+        entry = testData[i]
+        res = traverse(DT,entry)
+        test_prediction_list[i] = res
+        if (res != entry[-1]):
             test_error_count += 1
     test_error = test_error_count / len(testData)
 
+    ####################################################################
+    # Write the labels for train/test data + metrics
+    ####################################################################
+
+    for prediction in train_prediction_list:
+        train_out.write(prediction + "\n")
+
+    for prediction in test_prediction_list:
+        test_out.write(prediction + "\n")
+
+    metrics_out.write("error(train): %f" % train_error + "\n")
+    metrics_out.write("error(test): %f" % test_error)
 
 
     train_input.close()
