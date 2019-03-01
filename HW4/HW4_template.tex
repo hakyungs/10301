@@ -1,0 +1,907 @@
+
+%-----------------------------------------------------------------------------
+% PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%-----------------------------------------------------------------------------
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amsfonts}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{titling}
+\usepackage{url}
+\usepackage{xfrac}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{paralist}
+\usepackage{epstopdf}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\usepackage{fancyvrb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{float}
+\usepackage{paralist}
+\usepackage[svgname]{xcolor}
+\usepackage{enumerate}
+\usepackage{array}
+\usepackage{times}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{comment}
+\usepackage{environ}
+\usepackage{times}
+\usepackage{textcomp}
+\usepackage{caption}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\usepackage{parskip} % For NIPS style paragraphs.
+\usepackage[compact]{titlesec} % Less whitespace around titles
+\usepackage[inline]{enumitem} % For inline enumerate* and itemize*
+\usepackage{datetime}
+\usepackage{comment}
+% \usepackage{minted}
+\usepackage{lastpage}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes,decorations}
+\usepackage{framed}
+\usepackage{booktabs}
+\usepackage{cprotect}
+\usepackage{fancyvrb}
+\usepackage{xcolor}
+\usepackage{verbatimbox}
+\usepackage[final]{listings}
+
+
+
+\usepackage{xcolor}
+\usepackage{verbatimbox}
+\usepackage[many]{tcolorbox}
+\newcommand{\blackcircle}{\tikz\draw[black,fill=black] (0,0) circle (1ex);}
+\renewcommand{\circle}{\tikz\draw[black] (0,0) circle (1ex);}
+\newtcolorbox[]{solution}[1][]{%
+    breakable,
+    enhanced,
+    colback=white,
+    title=Solution,
+    #1
+}
+\usepackage{cancel}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Better numbering                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Custom math                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{601math.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code highlighting with listings         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{bluekeywords}{rgb}{0.13,0.13,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.9,0,0}
+\definecolor{light-gray}{gray}{0.95}
+
+\newcommand{\MYhref}[3][blue]{\href{#2}{\color{#1}{#3}}}%
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstdefinelanguage{Shell}{
+  keywords={tar, cd, make},
+  %keywordstyle=\color{bluekeywords}\bfseries,
+  alsoletter={+},
+  ndkeywords={python, py, javac, java, gcc, c, g++, cpp, .txt, octave, m, .tar},
+  %ndkeywordstyle=\color{bluekeywords}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  backgroundcolor = \color{light-gray}
+}
+
+\lstset{columns=fixed, basicstyle=\ttfamily,
+    backgroundcolor=\color{light-gray},xleftmargin=0.5cm,frame=tlbr,framesep=4pt,framerule=0pt}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rotated Column Headers                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{adjustbox}
+\usepackage{array}
+
+%https://tex.stackexchange.com/questions/32683/rotated-column-titles-in-tabular
+
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{45}{1em}}}% no optional argument here, please!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Custom box for highlights               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Define box and box title style
+\tikzstyle{mybox} = [fill=blue!10, very thick,
+    rectangle, rounded corners, inner sep=1em, inner ysep=1em]
+
+% \newcommand{\notebox}[1]{
+% \begin{tikzpicture}
+% \node [mybox] (box){%
+%     \begin{minipage}{\textwidth}
+%     #1
+%     \end{minipage}
+% };
+% \end{tikzpicture}%
+% }
+
+\NewEnviron{notebox}{
+\begin{tikzpicture}
+\node [mybox] (box){
+    \begin{minipage}{\textwidth}
+        \BODY
+    \end{minipage}
+};
+\end{tikzpicture}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Commands for customizing the assignment %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\courseName}{10-601 Introduction to Machine Learning (Spring 2019)}
+\newcommand{\hwName}{Homework 4: Logistic Regression}
+\newcommand{\outDate}{Fri, Feb 15, 2019}
+\newcommand{\dueDate}{Fri, Mar 1, 2019 11:59 PM}
+
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{\hwName}}
+\rhead{\fancyplain{}{\courseName}}
+\cfoot{\thepage}
+
+\title{\textsc{\hwName}} % Title
+
+
+\author{\courseName\\
+  Carnegie Mellon University \\
+\url{piazza.com/cmu/spring2019/1030110601} \\
+OUT: \outDate{}\thanks{Compiled on \today{} at \currenttime{}} \\
+DUE: \dueDate{} \\ 
+TAs: Emilio Arroyo-Fang, Yash Chandarana, Aashi Manglik, Varun Joshi, and Fabricio Flores}
+
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Useful commands for typesetting the questions %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand \expect {\mathbb{E}}
+\newcommand \mle [1]{{\hat #1}^{\rm MLE}}
+\newcommand \map [1]{{\hat #1}^{\rm MAP}}
+\newcommand \argmax {\operatorname*{argmax}}
+\newcommand \argmin {\operatorname*{argmin}}
+\newcommand \code [1]{{\tt #1}}
+\newcommand \datacount [1]{\#\{#1\}}
+\newcommand \ind [1]{\mathbb{I}\{#1\}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document configuration %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Don't display a date in the title and remove the white space
+\predate{}
+\postdate{}
+\date{}
+
+% Don't display an author and remove the white spacez
+%\preauthor{}
+%\postauthor{}
+
+%%%%%%%%%%%%%%%%%%
+% Begin Document %
+%%%%%%%%%%%%%%%%%% 
+
+\begin{document}
+
+\maketitle
+
+\begin{notebox}
+\paragraph{Summary} In this assignment, you will build a sentiment polarity analyzer, which will be capable of analyzing the overall sentiment polarity (positive or negative) . In Section  \ref{sec:written} you will warm up by deriving stochastic gradient descent updates for multinomial logistic regression. Then in Section \ref{programming} you will implement a binary logistic regression model as the core of your natural language processing system.
+\end{notebox}
+
+\section*{START HERE: Instructions}
+\begin{itemize}
+
+\item \textbf{Collaboration Policy}: Collaboration on solving the homework is allowed, after you have thought about the problems on your own. It is also OK to get clarification (but not solutions) from books or online resources, again after you have thought about the problems on your own. There are two requirements: first, cite your collaborators fully and completely (e.g., ``Jane explained to me what is asked in Question 3.4''). Second, write your solution {\em independently}: close the book and all of your notes, and send collaborators out of the room, so that the solution comes from you only.  See the collaboration policy on the website for more information: \url{http://www.cs.cmu.edu/~mgormley/courses/10601/about.html#7-academic-integrity-policies}
+\item\textbf{Late Submission Policy:} See the late submission policy
+  here:
+  \url{http://www.cs.cmu.edu/~mgormley/courses/10601/about.html#late-homework-policy}
+
+\item\textbf{Submitting your work:} You will use Gradescope to submit
+  answers to all questions, and Autolab to submit your code. Please
+  follow instructions at the end of this PDF to correctly submit all your code to Autolab.
+
+  \begin{itemize}
+   \item \textbf{Gradescope:} For written problems such as derivations,
+       proofs, or plots we will be using Gradescope
+       (\url{https://gradescope.com/}). Submissions can be handwritten, but
+       should be labeled and clearly legible. If your writing is not
+       legible, you will not be awarded marks. Alternatively, submissions
+       can be written in LaTeX. Upon submission, label each question
+       using the template provided. Regrade requests can be made, however
+       this gives the TA the opportunity to regrade your entire paper,
+       meaning if additional mistakes are found then points will be
+       deducted.
+       %   
+       Each derivation/proof should be  completed on a separate page.
+
+  \item \textbf{Autolab:} You will submit your code for programming
+    questions on the homework to Autolab
+    (\url{https://autolab.andrew.cmu.edu/}). After uploading your code,
+    our grading scripts will autograde your assignment by running your
+    program on a virtual machine (VM). 
+    %
+    The software installed on the VM is identical to that on
+    \texttt{linux.andrew.cmu.edu}, so you should check that your code
+    runs correctly there. If developing locally, check that the
+    version number of the programming language environment
+    (e.g. Python 2.7, Octave 3.8.2, OpenJDK 1.8.0, g++ 4.8.5) and
+    versions of permitted libraries (e.g. \texttt{numpy} 1.7.1) match
+    those on \texttt{linux.andrew.cmu.edu}.
+    % 
+    Octave users: Please make sure you do not use any
+    Matlab-specific libraries in your code that might make it fail
+    against our tests.
+    %
+    Python3 users: Please include a blank file called python3.txt (case-sensitive) in your tar submission. 
+    %
+    You have a {\bf total of 10 Autolab submissions}. Use them
+    wisely. In order to not waste Autolab submissions, we recommend
+    debugging your implementation on your local machine (or the linux
+    servers) and making sure your code is running correctly first
+    before any Autolab submission. 
+    %
+
+  \end{itemize}
+  
+\item\textbf{Materials:} Download from autolab the tar file ("Download
+  handout"). The tar file will contain all the data that you will need in order to complete this assignment.
+
+\end{itemize}
+
+
+\begin{notebox}
+\paragraph{Linear Algebra Libraries} When implementing machine learning algorithms, it is often convenient to have a linear algebra library at your disposal. In this assignment, Java users may use EJML\footnote{\url{https://ejml.org}} and C++ users Eigen\footnote{\url{http://eigen.tuxfamily.org/}}. Details below. 
+%
+(As usual, Python users have numpy; Octave users have built-in matrix support.)
+%
+\begin{description}
+\item[Java] EJML is a pure Java linear algebra package with three interfaces. We strongly recommend using the SimpleMatrix interface. Autolab will use EJML version 3.3. The command line arguments above demonstrate how we will call you code. The classpath inclusion \lstinline{-cp "./lib/ejml-v0.33-libs/*:./"} will ensure that all the EJML jars are on the classpath as well as your code. 
+\item[C++] Eigen is a header-only library, so there is no linking to worry about---just \lstinline{#include} whatever components you need. Autolab will use Eigen version 3.3.4. The command line arguments above demonstrate how we will call you code. The argument \lstinline{-I./lib} will include the \lstinline{lib/Eigen} subdirectory, which contains all the headers.
+\end{description} 
+We have included the correct versions of EJML/Eigen in the handout.tar for your convenience. Do {\bf not} include EJML or Eigen in your Autolab submission tar; the autograder will ensure that they are in place. 
+\end{notebox}
+
+
+\clearpage
+
+\section{Written Questions [20 pts]}
+\label{sec:written}
+
+
+\subsection{Multinomial Logistic Regression [12 pts]}
+Multinomial logistic regression, also known as softmax regression and multiclass logistic regression, is a generalization of binary logistic regression. In this problem setting we have a dataset:
+\[
+\mathcal{D} = \left\{\left(\xv^{(1)}, y^{(1)}\right), \ldots, \left(\xv^{(N)}, y^{(N)}\right)\right\} \text{ where } \xv^{(i)} \in \Rb^M, y^{(i)} \in \{1, \ldots, K\} \text{ for } i = 1, \ldots, N
+\]
+Here $N$ is the number of training examples, $M$ is the number of features, and $K$ is the number of classes, which is usually greater than two to be interesting and not equivalent to binary logistic regression.
+
+\begin{enumerate}[label=(\alph*)]
+    \item {\bf [2 Points]} To motivate multinomial logistic regression, we will first look at a general way to extend a binary classifier to a multiclass classifier and apply it to logistic regression. One way to extend a binary classifier to a multiclass classifier is to use the One versus Rest (OvR) method. In this method, we will train $K$ binary classifiers, independently. Each classifier $h_i(\xv)$  will determine if a point $\xv$ is in class $i$ or not for $i = 1, \ldots, K$. 
+    
+    Suppose we have successfully trained $K$ \emph{binary logistic regression} classifiers in such a manner. Propose a method for determining the class of a new unlabeled point $\xv^{(*)}$ using the set of binary logistic regression classifiers $h_1(\xv), \ldots, h_K(\xv)$. Explain your reasoning. 
+
+    
+    \begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \end{solution}
+    
+    
+    
+    \clearpage
+    \item {\bf [1 Points]} Now we would like a method to do multiclass classification without having to train more than one classifier. Multinomial logistic regression is such a method. Remember that in multinomial logistic regression, we have
+    \[
+    p\left(y \mid \xv, \Thetav\right) = \frac{\exp\left(\thetav_{y} \xv \right)}{\sum_{j = 1}^K \exp\left(\thetav_{j} \xv\right)} = \text{softmax}((\Thetav \xv)_y)
+    \]
+    where $\Thetav$ is the parameter matrix of size $K \times (M + 1)$ and $\thetav_y$ denotes the $y$th \textbf{row} of $\Thetav$, which is the parameter vector for class $y$. Since we have folded the bias term into $\Thetav$ we now have $\xv \in \Rb^{M + 1}$. Let us represent class $C_k$ with a \emph{one-hot encoding}, specifically let $C_k \in \Rb^K$ where the $k$th entry in $C_k$ is 1, and 0 everywhere else. Let us also define a target matrix $\Tv$ of size $N \times K$, where the $i$th {\bf row} of $\Tv$ is $C_{y^{(i)}}$, where only the  $y^{(i)}$th entry is 1, and 0 else where.
+    
+    Write down the data conditional likelihood $ \mathcal{L}(\Thetav \mid \Tv, \Xv)$ in terms of $N$, $K$, $\Tv$ and $p\left(C_j \mid x^{(i)}, \Thetav \right)$. Please note that $\mathcal{L}(\Thetav \mid \Tv, \Xv) = p(\Tv \mid \Thetav, \Xv)$, where likelihood is a function of parameters (not probability), and it is equal in value to the label probability conditioned on data and parameters.
+    
+    \begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \end{solution}
+    \clearpage
+    
+    
+    
+    
+    \item {\bf [1 Points]} Write down the \emph{negative} conditional log-likelihood of the data in terms of $N$, $K$, $\Tv$ and $p\left(C_j \mid x^{(i)}, \Thetav \right)$. This will be your objective function $J(\Thetav)$, also known as cross-entropy loss.
+    
+     \begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \end{solution}
+    
+    \clearpage
+    
+    \item {\bf [4 Points]} Now let's derive the partial derivative of the objective function with respect to the $k$th parameter vector $\thetav_k$. That is, derive $\frac{ \partial J(\Thetav) }{ \partial \thetav_k}$, where $J(\Thetav)$ is the objective function that you provided above. Show that the partial derivative  is as follows:
+    
+    $$
+    \frac{\partial J(\Thetav)}{\partial \thetav_k} = - \sum_{i = 1}^N \left(\Tv_{i, k} - p\left(C_k \mid \xv^{(i)}, \Thetav\right)\right)  \xv^{(i)}
+    $$
+    
+    Show all steps of the derivation. (Please pay attention that $\Tv_i$ is $C_{y^{(i)}}$, and you should think about the reason why $y^{(i)}$ disappears in this equation, and what is the relation between $y^{(i)}$ and $\Tv_{i, k}$).
+    
+    
+    \begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \end{solution}
+    
+    \clearpage
+    
+    \item {\bf [2 Points]} Write down the stochastic gradient descent update steps for an arbitrary $\theta_k$ using the $i^{th}$ training example in terms of $\mathbf{x^{(i)}}$, $\Tv_{i, k}$ and $p\left(C_k \mid \xv^{(i)}, \Thetav\right)$.
+    
+    \begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    
+    \end{solution}
+    
+    
+    \item {\bf [2 Points]} If you train mutinomial logistic regression for infinite iterations without $\ell_1 = |\Thetav|$ (sum of absolute values of all entries in the matrix ) or $\ell_2=||\Thetav||_2$ (square root of sum of squares of all entries in the matrix) regularization, the weights can go to infinity. What is an intuitive explanation for this phenomenon? How does regularization help correct the problem?
+    
+    \begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip    
+    \end{solution}
+    
+    \clearpage
+    
+\end{enumerate}
+
+\subsection{Empirical Questions [8 pts]}
+\label{sec:empirical}
+
+The following questions should be completed as you work through the programming portion of this assignment (Section \ref{programming}).
+
+\begin{enumerate}
+    
+\item {\bf Plots [2 Points]} 
+For \emph{Model 1}, using the data in the largedata folder in the handout, make a plot that shows the average negative log likelihood for the training and validation data sets after each of 200 epochs. The y-axis should show the negative log likelihood and the x-axis should show the number of epochs.  
+
+\begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+\end{solution}
+
+\item {\bf Plots [2 Points]} 
+For \emph{Model 2}, make a plot as in the previous question.
+        
+\begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+\end{solution}
+\clearpage
+
+
+\item {\bf Explanation of Experiments [2 Points]}
+Write a few sentences explaining the output of the above experiments. In particular do the training and validation log likelihood curves look the same or different? Why?
+
+\begin{solution}
+    % If you are using the latex template, remove the empty spaces
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+    \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip
+\end{solution}
+
+\item {\bf Results [2 Points]} 
+Make a table with your train and test error for the large data set (found in the largedata folder in the handout) for each of the 2 models after running for 50 epochs.
+
+\begin{solution}
+     \begin{table}[H]
+        \centering
+        \begin{tabular}{l|l|l}
+        \toprule
+        & Train Error & Test Error \\ 
+        \midrule
+        Model 1      &         &         \\ 
+        Model 2 &         &         \\ 
+        \bottomrule
+        \end{tabular}
+        \caption{``Large Data'' Results}
+        \label{results}
+    \end{table}
+\end{solution}
+
+
+        
+\end{enumerate}
+
+
+\newpage
+\section{Programming [80 pts]}
+\label{programming}
+
+Your goal in this assignment is to implement a working Natural Language Processing (NLP) system, i.e., a sentiment polarity analyzer, using binary logistic regression. You will then use your algorithm to determine whether a review is positive or negative using movie reviews as data. You will do some very basic feature engineering, through which you are able to improve the learner's performance on this task. You will write two programs: \texttt{feature.\{py|java|cpp|m\}} and \texttt{lr.\{py|java|cpp|m\}} to jointly complete the task. The programs you write will be automatically graded using the Autolab system. You may write your programs in {\bf Octave, Python, Java,} or {\bf C++}. However, you should use the same language for all parts below.
+
+
+\subsection{The Tasks and Data Sets}\label{dataset}
+
+
+  {\bf Materials } Download the tar file from Autolab (``Download handout"). The tar file will contain all the data that you will need in order to complete this assignment.
+  
+ The handout contains data from the Movie Review Polarity data set (for more details, see \url{http://www.cs.cornell.edu/people/pabo/movie-review-data/}).  Currently, the original data is distributed as a collection of separate files (one movie review per file). In the Autolab handout, we have converted this to a one line per example format consisting of the label 0 or 1 in the first column followed by all the words in the movie review (with none of the line breaks) in the second column.
+ 
+ 
+ 
+ Each data point consists of a label (0 for negatives and 1 for positives) and a attribute (a set of words as a whole). In the attribute, words are separated using white-space (punctuations are also separated with white-space). All characters are lowercased. No fancy pre-processing on the plain text is needed, because we have already done most of the work for you in the handout. We also provide a dictionary file (\lstinline{dict.txt}) to limit the vocabulary to be considered in this assignments. Actually, this dictionary is constructed from the training data. Examples of the dictionary content are as follows, where the second column is the index of the word. Column one and column two are separated with white-space. Each line in \lstinline{dict.txt}  has the format: \lstinline{word index\n}.
+ 
+ \begin{lstlisting}
+films 0
+adapted 1
+from 2
+comic 3
+\end{lstlisting}
+ 
+ Examples of the data are as follows.
+ 
+ 
+\begin{lstlisting}
+1 david spade has a snide , sarcastic sense of humor that works ... 
+0 " mission to mars " is one of those annoying movies where , in ...
+1 anyone who saw alan rickman's finely-realized performances in ...
+1 ingredients : man with amnesia who wakes up wanted for murder , ...
+1 ingredients : lost parrot trying to get home , friends synopsis : ... 
+1 note : some may consider portions of the following text to be ...
+0 aspiring broadway composer robert ( aaron williams ) secretly ...
+0 america's favorite homicidal plaything takes a wicked wife in " ...
+\end{lstlisting}
+
+We have provided you with two subsets of the movie review data set. Each data set is divided into a training, a validation, and a test data set.
+%
+The small data set (\lstinline{smalltrain_data.tsv}, \lstinline{smallvalid_data.tsv}, and \lstinline{smalltest_data.tsv}) can be used while debugging your code. We have included the reference output files for this data set after \textbf{30 training epochs} (see directory \lstinline{smalloutput/}). 
+%
+We have also included a larger data set (\lstinline{train_data.tsv}, \lstinline{valid_data.tsv}, \lstinline{test_data.tsv}) with reference outputs for this data set after \textbf{60 training epochs}  (see directory \lstinline{largeoutput/}) . This data set can be used to ensure that your code runs fast enough to pass the autograder tests. Your code should be able to perform 60-epoch training and finish  predictions through all of the data in around one minute for each of the models: one minute for Model 1 and one minute for Model 2.
+
+The data files are in tab-separated-value (\lstinline{.tsv}) format. This is identical to a comma-separated-value (\lstinline{.csv}) format except that instead of separating columns with commas, we separate them with a tab character, \lstinline{\t}. Each row is ended by a Unix style line ending, \lstinline{\n}. The first column always contains the label and the second column the set of words:  \lstinline{label\tword1 word2 word3 ... wordN\n}.
+ 
+\subsection{Model Definition}\label{modeldescript}
+ 
+ Assume you are given a data set with $N$ training examples and $M$ features. We first write down the \emph{negative} conditional log-likelihood of the training data in terms of the design matrix $\Xv$, the labels $\yv$, and the parameter vector $\thetav$. This will be your objective function $J(\thetav)$ for gradient descent. 
+%
+(Recall that $i$th row of the design matrix $\Xv$ contains the features $\xv^{(i)}$ of the $i$th training example. The $i$th entry in the vector $\yv$ is the label $y^{(i)}$ of the $i$th training example.  Here we assume that each feature vector $\xv^{(i)}$ contains a bias \emph{feature}, e.g. $x_0^{(i)} = 1 \,\,\forall i \in \{1,\ldots,N\}$. As such, \textbf{the bias parameter is folded into our parameter vector $\thetav$.}
+
+
+Taking $\x^{\left(i\right)}$ to be a $(M+1)$-dimensional vector where $x^{(i)}_0=1$, the likelihood $p\left(\y|\mathbf{X},\thetav\right)$ is:
+\begin{align}
+     p(\y |\mathbf{X},\thetav) &= \prod_{i = 1}^N p(y^{(i)} | \x^{(i)}, \thetav) = \prod_{i = 1}^N \left(\frac{e^{\thetav^T\x^{\left(i\right)}}}{1+e^{\thetav^T\x^{\left(i\right)}}}\right)^{y^{(i)}}\left(\frac{1}{1+e^{\thetav^T\x^{\left(i\right)}}}\right)^{\left(1-y^{(i)}\right)}\\
+    &= \prod_{i=1}^N \frac{\left(e^{\thetav^T\x^{\left(i\right)}}\right)^{y^{(i)}}}{1+e^{\thetav^T\x^{\left(i\right)}}}
+\end{align}
+Hence, the negative conditional log-likelihood is:
+\begin{align}
+    J(\thetav)= -\log p\left(\y|\mathbf{X},\thetav\right) &= \sum_{i=1}^N  -y^{(i)}\left(\thetav^T\x^{\left(i\right)}\right)+\log\left(1+e^{\thetav^T\x^{\left(i\right)}}\right)
+\end{align}
+
+
+The partial derivative of the negative log-likelihood $J(\thetav)$ with respect to $\thetav_j \,, j\in\{0,...,M\}$ is:
+\begin{align}
+    \frac{\partial J(\thetav)}{\partial \thetav_j} &= -\sum_{i=1}^N \x_j^{\left(i\right)}\left[y^{(i)}-\frac{e^{\thetav^T\x^{\left(i\right)}}}{1+e^{\thetav^T\x^{\left(i\right)}}}\right]
+\end{align}
+
+
+The gradient descent update rule  for binary logistic regression for parameter element $\thetav_j$ is
+
+\begin{align}
+    \thetav_j \leftarrow \thetav_j - \eta \frac{\partial J(\thetav)}{\partial \thetav_j}
+\end{align}
+
+
+Then, the stochastic gradient descent update for  parameter element $\thetav_j$ using the $i$th datapoint $(\x^{(i)},y^{(i)})$ is:
+\begin{align}
+    \thetav_j \leftarrow \thetav_j + \eta \x_j^{\left(i\right)}\left[y^{(i)}-\frac{e^{\thetav^T\x^{\left(i\right)}}}{1+e^{\thetav^T\x^{\left(i\right)}}}\right]
+\end{align}
+ 
+
+
+\subsection{Implementation}
+
+The implementation consists of two programs, a feature extraction program (\texttt{feature.\{py|java|cpp|m\}}) and a sentiment analyzer program (\texttt{lr.\{py|java|cpp|m\}}) using binary logistic regression. The programming pipeline is illustrated as follows.
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width = 0.7\textwidth]{Pipeline.png}
+        \caption{Programming pipeline for sentiment analyzer based on binary logistic regression}
+        \label{pipeline}
+\end{figure}
+
+
+This first program is \texttt{feature.\{py|java|cpp|m\}}, that converts raw data (e.g., \lstinline{train_data.tsv}, \lstinline{valid_data.tsv}, and \lstinline{test_data.tsv}) into formatted training, validation and test data based on the vocabulary information in the dictionary file \lstinline{dict.txt}. To be specific, this program is to transfer the whole movie review text into a feature vector using some feature extraction methods. The formatted data sets should be stored in .tsv format. Details of formatted data sets will be introduced in Section~\ref{format_output} and Section~\ref{feature}.
+
+The second program is \texttt{lr.\{py|java|cpp|m\}}, that implements a sentiment polarity analyzer using binary logistic regression. The file should learn the parameters of a binary logistic regression model that predicts a sentiment polarity (i.e. label) for the corresponding feature vector of each movie review. The program should output the labels of the training and test examples and calculate training and test error (percentage of incorrectly labeled reviews). As will be discussed later, efficient computation can be obtained with the help of the indexing information in the dictionary file \lstinline{dict.txt}.
+
+
+Your implementation must satisfy the following requirements:
+\begin{itemize}
+    \item The \texttt{feature.\{py|java|cpp|m\}} must produce a sparse representation of the data using the label-index-value format \{\lstinline{label index[word1]:value1  index[word2]:value2...\n} \}. We will use unseen data to test your feature output separately. (see Section~\ref{format_output} and Section~\ref{feature} on feature engineering for details on how to do this). 
+    \item Ignore the words not in the vocabulary of \lstinline{dict.txt} when the analyzer encounters one in the test or validation data.
+    \item Set the trimming threshold to a constant $t=4$ for Model 2 feature extraction (see Section~\ref{feature}). 
+    \item Initialize all model parameters to $0$.
+    \item Use stochastic gradient descent (SGD) to optimize the parameters for a binary logistic regression model. The number of times SGD loops through all of the training data (\texttt{num\_epoch}) will be specified as a command line flag. Set your learning rate as a constant  $\eta = 0.1$.
+    \item Perform stochastic gradient descent updates on the training data \textbf{in the order that the data is given in the input file}. Although you would typically shuffle training examples when using stochastic gradient descent, in order to autograde the assignment, we ask that you {\bf DO NOT} shuffle trials in this assignment.
+    \item Be able to select which one of two feature extractions you will use in your logistic regression model using a command line flag (see Section~\ref{feature})
+    \item Do not hard-code any aspects of the data sets into your code. We will autograde your programs on multiple (hidden) data sets that include different attributes and output labels.
+\end{itemize}
+
+Careful planning will help you to correctly and concisely implement your program. Here are a few \emph{hints} to get you started.
+\begin{itemize}
+    \item Write a function that takes a single SGD step on the $i$th training example. Such a function should take as input the model parameters, the learning rate, and the features and label for the $i$th training example. It should update the model parameters in place by taking one stochastic gradient step.
+    \item Write a function that takes in a set of features, labels, and model parameters and then outputs the error (percentage of labels incorrectly predicted). You can also write a separate function that takes the same inputs and outputs the negative log-likelihood of the regression model.
+\end{itemize}
+
+
+
+\subsubsection{Command Line Arguments}
+The autograder runs and evaluates the output from the files generated, using the following command (note \lstinline{feature} will be run before \lstinline{lr}):
+
+\begin{tabbing}
+For Python: \=\texttt{\$ \textbf{python} feature.\textbf{py} [args1\dots]}\\
+\>\texttt{\$ \textbf{python} lr.\textbf{py} [args2\dots]}\\
+For Java: \>\texttt{\$ \textbf{java} feature.\textbf{java} [args1\dots]}\\
+\>\texttt{\$ \textbf{java} lr.\textbf{java} [args2\dots]}\\
+For C++: \>\texttt{\$ \textbf{g++} feature.\textbf{cpp} ./a.out [args1\dots]}\\
+\>\texttt{\$ \textbf{g++} lr.\textbf{cpp} ./a.out [args2\dots]}\\
+For Octave: \>\texttt{\$ \textbf{octave} -qH feature.\textbf{m} [args1\dots]}\\
+\>\texttt{\$ \textbf{octave} -qH lr.\textbf{m} [args2\dots]}
+\end{tabbing}
+
+Where above \texttt{[args1\dots]} is a placeholder for eight command-line arguments:\texttt{<train\_input>}\newline \texttt{<validation\_input> <test\_input> <dict\_input> <formatted\_train\_out> \newline <formatted\_validation\_out>  <formatted\_test\_out> <feature\_flag>}. These arguments are described in detail below:
+\begin{enumerate}
+    \item \texttt{<train\_input>}: path to the training input \texttt{.tsv} file (see Section~\ref{dataset})
+    \item \texttt{<validation\_input>}: path to the validation input \texttt{.tsv} file (see Section~\ref{dataset})
+    \item \texttt{<test\_input>}: path to the test input \texttt{.tsv} file (see Section~\ref{dataset})
+    \item \texttt{<dict\_input>}: path to the dictionary input \texttt{.txt} file (see Section~\ref{dataset})
+    \item \texttt{<formatted\_train\_out>}: path to output \texttt{.tsv} file to which the feature extractions on the \emph{training} data should be written (see Section~\ref{format_output})
+    \item \texttt{<formatted\_validation\_out>}: path to output \texttt{.tsv} file to which the feature extractions on the \emph{validation} data should be written (see Section~\ref{format_output})
+    \item \texttt{<formatted\_test\_out>}: path to output \texttt{.tsv} file to which the feature extractions on the \emph{test} data should be written (see Section~\ref{format_output})
+    \item \texttt{<feature\_flag>}: integer taking value 1 or 2 that specifies whether to construct the Model 1 feature set or the Model 2 feature set (see Section~\ref{feature})---that is, if \lstinline{feature_flag}==1 use Model 1 features; if \lstinline{feature_flag}==2 use Model 2 features
+\end{enumerate}
+
+
+On the other hand, \texttt{[args2\dots]} is a placeholder for eight command-line arguments:\texttt{<formatted\_train\_input>}\newline \texttt{<formatted\_validation\_input> <formatted\_test\_input> <dict\_input> <train\_out> \newline <test\_out> <metrics\_out> <num\_epoch>}. These arguments are described in detail below:
+\begin{enumerate}
+    \item \texttt{<formatted\_train\_input>}: path to the formatted training input \texttt{.tsv} file (see Section~\ref{format_output})
+    \item \texttt{<formatted\_validation\_input>}: path to the formatted validation input \texttt{.tsv} file (see Section~\ref{format_output})
+    \item \texttt{<formatted\_test\_input>}: path to the formatted test input \texttt{.tsv} file (see Section~\ref{format_output})
+    \item \texttt{<dict\_input>}: path to the dictionary input \texttt{.txt} file (see Section~\ref{dataset})
+    \item \texttt{<train\_out>}: path to output \texttt{.labels} file to which the prediction on the \emph{training} data should be written (see Section~\ref{output})
+    \item \texttt{<test\_out>}: path to output \texttt{.labels} file to which the prediction on the \emph{test} data should be written (see Section~\ref{output})
+    \item \texttt{<metrics\_out>}: path of the output \texttt{.txt} file to which metrics such as train and test error should be written (see Section~\ref{metrics})
+    %\item \texttt{<model\_out>}: path of the output \texttt{.txt} file to which the model parameters should be written (see Section~\ref{model})
+    \item \texttt{<num\_epoch>}: integer specifying the number of times SGD loops through all of the training data (e.g., if \texttt{<num\_epoch>} equals 5, then each training example will be used in SGD 5 times). 
+\end{enumerate}
+
+As an example, if you implemented your program in Python, the following two command lines would run your programs on the data provided in the handout for 60 epochs using the features from Model 1.
+
+\begin{lstlisting}[language=Shell]
+$ python feature.py train_data.tsv valid_data.tsv test_data.tsv \
+dict.txt formatted_train.tsv formatted_valid.tsv formatted_test.tsv 1
+
+$ python lr.py formatted_train.tsv formatted_valid.tsv formatted_test\
+.tsv dict.txt train_out.labels test_out.labels metrics_out.txt 60
+
+\end{lstlisting}
+
+\begin{notebox}
+{\bf Important Note:} You will not be writing out the predictions on validation data, only on train and test data. The validation data is \emph{only} used to give you an estimate of held-out negative log-likelihood at the end of each epoch during training.\footnote{For this assignment, we will always specify the number of epochs. However, a more mature implementation would monitor the performance on validation data at the end of each epoch and stop SGD when this validation log-likelihood appears to have converged. You should \textbf{ \emph{not}} implement such a convergence check for this assignment.} 
+\end{notebox}
+
+
+\subsubsection{Output: Formatted Data Files} \label{format_output}
+Your \lstinline{feature} program should write three output \texttt{.tsv} files converting original data to formatted data on \texttt{<formatted\_train\_out>}, \texttt{<formatted\_valid\_out>}, and \texttt{<formatted\_test\_out>}. Each should contain the formatted presentation for each example printed on a new line. Use \lstinline{\n} to create a new line. The format for each line should exactly match 
+
+label\lstinline{\t}index[word1]:value1\lstinline{\t}index[word2]:value2\lstinline{\t}...index[wordM]:valueM\lstinline{\n}
+
+Where above, the first column is label, and the rest are "index[word]:value" feature elements. index[word] is the index of the word in the dictionary, and value is the value of this feature (in this assignment, the value is one or zero). There is a colon, \lstinline{:}, between index[word] and corresponding value. Columns are separated using a table character, \lstinline{\t}. The handout contains example \texttt{<formatted\_train\_out>}, \newline \texttt{<formatted\_valid\_out>}, and \texttt{<formatted\_test\_out>} for your reference.
+
+The formatted output will be checked separately by the autograder by running your \lstinline{feature} program on some unseen data sets and evaluating your output file against the reference formatted files. Examples of content of formatted output file are given below.
+
+\begin{lstlisting}
+0	2915:1	21514:1	166:1	32:1	10699:1	305:1	...
+0	7723:1	51:1	8701:1	74:1	370:1	8:1    ...
+1	229:1	48:1	326:1	43:1	576:1	55:1	...
+1	8126:1	1349:1	58:1	4709:1	48:1	8319:1	...
+\end{lstlisting}
+
+
+\subsubsection{Output: Labels Files} \label{output}
+Your \lstinline{lr} program should produce two output \texttt{.labels} files containing the predictions of your model on training data (\texttt{<train\_out>}) and test data (\texttt{<test\_out>}). Each should contain the predicted labels for each example printed on a new line. Use \lstinline{\n} to create a new line. 
+
+Your labels should exactly match those of a reference implementation -- this will be checked by the autograder by running your program and evaluating your output file against the reference solution. Examples of the content of the output file are given below.
+
+\begin{lstlisting}
+0
+0
+1
+0
+\end{lstlisting}
+
+\subsubsection{Output Metrics} \label{metrics}
+Generate a file where you report the following metrics: 
+
+\begin{description}
+
+\item[error] After the final epoch (i.e. when training has completed fully), report the final training error \newline \lstinline{error(train)} and test error \lstinline{error(test)}. 
+\end{description}
+
+All of your reported numbers should be within 0.01 of the reference solution. The following is the reference solution for large data set with Model 1 feature structure after 60 training epochs. See \newline \lstinline{model1_metrics_out.txt} in the handout.
+
+\begin{lstlisting}
+error(train): 0.074167
+error(test): 0.247500
+\end{lstlisting}
+
+Take care that your output has the exact same format as shown above. Each line should be terminated by a Unix line ending \lstinline{\n}. There is a whitespace character after the colon.
+
+
+
+\subsubsection{Feature Engineering} \label{feature}
+
+Your implementation of \texttt{feature.\{py|java|cpp|m\}} should have an input argument \texttt{<feature\_flag>} that specifies one of two types of feature extraction structures that should be used by the logistic regression model. The two structures are illustrated below as probabilities of the labels given the inputs.
+
+\begin{description}
+    \item[Model 1] $p(y^{(i)} \mid \bf{1}_{occur}( \x^{(i)},Vocab), \thetav)$: This model defines a probability distribution over the current label $y^{(i)}$ using the parameters $\thetav$ and a \emph{bag-of-word} feature vector $\bf{1}_{occur}( \x^{(i)},Vocab)$ indicating which word in vocabulary $\bf{Vocab}$ of the dictionary occurs at least once in the movie review example $\x^{(i)}$. The entry in the indicator vector associated  to the occurring word will set to one (otherwise, it is zero). This bag-of-word model should be used when \texttt{<feature\_flag>} is set to 1.
+    
+    \item[Model 2] $p(y^{(i)} \mid \bf{1}_{trim}(  \x^{(i)},Vocab,$ $t), \thetav)$: This model defines a probability distribution over the current label $y^{(i)}$ using the parameters $\thetav$ and a \emph{trimmed} bag-of-word feature vector $\bf{1}_{trim}( \x^{(i)},Vocab,$ $t)$ indicating  (1) which word in vocabulary $\bf{Vocab}$ of the dictionary occurs in the movie review example $\x^{(i)}$, AND (2) the \emph{count of the word} is LESS THAN ($<$) threshold $t$. The entry in the indicator vector associated  to the word that satisfies both conditions will set to one (otherwise, it is zero, including no shown and high-frequent words). This trimmed bag-of-word model should be used when \texttt{<feature\_flag>} is set to 2. In this assignment, use the constant trimming threshold $t=4$.
+    
+\end{description}
+
+The motivation of Model 2 is that keywords that truly represent the sentiment may not occur too frequently, this trimming strategy can make the feature presentation cleaner by removing highly repetitive words that are useless and neutral, such "the", "a", "to", etc. You will observe whether this basic and heuristic strategy based on this intuition will bring in performance improvement.
+
+Note that above $\bf{1}_{occur}$ and $\bf{1}_{trim}$ are described as a dense feature representation as showed in Tables \ref{tab:model1dense} for illustration purpose. In your implementation, you should further convert it to the representation in \ref{tab:model1sparse} for Model 1 and the representation in \ref{tab:model2sparse} for Model 2, such that the formatted data outputs match Section~\ref{format_output}.
+
+
+
+\subsubsection{Evaluation}
+
+Autolab will test your implementations on hidden data sets with the same format as the two data sets provided in the handout. \lstinline{feature} program and \lstinline{lr} program will be tested separately. To ensure that your code can pass the autolab tests in under 5 minutes (the maximum time length) be sure that your code can complete 60-epoch training and finish predictions through all of the data in the \lstinline{largedata} folder in around one minute for each of the models.
+
+% Empirical Questions moved to problem1.tex (see Matt's note on Slack)
+
+\subsection{Autolab Submission}
+
+You must submit a .tar file named {\tt lr.tar} containing \texttt{feature.\{py|m|java|cpp\}} and \newline \texttt{lr.\{py|m|java|cpp\}}.
+You can create that file by running:
+\begin{lstlisting}
+tar -cvf lr.tar feature.{py|m|java|cpp} lr.{py|m|java|cpp}
+\end{lstlisting}
+from the directory containing your code. 
+
+Some additional tips: {\bf DO NOT} compress your files; you are just
+creating a tarball. Do not use tar \texttt{-czvf}.  {\bf DO NOT} put
+the above files in a folder and then tar the folder.  Autolab is case
+sensitive, so observe that all your files should be named in {\bf
+  lowercase}. You must submit this file to the corresponding homework
+link on Autolab. The autograder for Autolab prints out some additional 
+information about the tests that it ran. You can view this output by selecting 
+ "Handin History" from the menu and then clicking one of the scores you 
+ received for a submission. For example on this assignment, among other things, 
+ the autograder will print out which language it detects (e.g. Python, Octave, C++, Java).  {\bf It is recommended that you create a new empty folder somewhere else, copy your implementation files there, and create tarball from there. This can ensure a clean submission without tarring unnecessary files.}
+ 
+ \begin{notebox}
+  {\bf Python3 Users:} Please include a blank file called python3.txt (case-sensitive) in your tar submission and we will execute your submitted program using Python 3 instead of Python 2.7.
+ \end{notebox}
+
+Note: For this assignment, you may make up to 10 submissions to Autolab before the deadline, but only your last submission will be graded.
+
+    
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newpage
+
+\appendix
+\section{Implementation Details for Logistic Regression}
+
+\subsection{Examples of Features}
+
+Here we provide examples of the features constructed by Model 1 and Model 2. Table \ref{tab:inputfile} shows an example input file, where column $i$  indexes the $i$th movie review example. Rather than working directly with this input file, you should transform from the sentiment/text representation into a label/feature vector representation.
+
+Table \ref{tab:model1dense} shows the dense occurrence-indicator representation expected for Model 1. The size of each feature vector (i.e. number of feature columns in the table) is equal to the size of the entire vocabulary of words stored in the given \lstinline{dict.txt} (this dictionary is actually constructed from the same training data in \lstinline{largeset}). Each row corresponds to a single example, which we have indexed by $i$.
+
+It would be \emph{highly impractical} to actually store your feature vectors $\xv^{(i)} \in \Rb^M$ in the dense representation shown in Table \ref{tab:model1dense} which takes $O(M)$ space per vector ($M$ is around 40 thousands for the dictionary). This is because the features are extremely sparse: for the second example ($i=2$), only three of the features is non-zero for Model 1 and only two for Model 2. As such, we now consider a sparse representation of the features that will save both memory and computation.
+
+Table \ref{tab:model1sparse} shows the sparse representation (bag-of-word representation) of the feature vectors. Each feature vector is now represented by a map from the index of the feature (e.g. {index[\tt "apple"]}) to its value which is 1. The space savings comes from the fact that we can omit from the map any feature whose value is zero. In this way, the map only contains \emph{non-zero entry} for each Model 1 feature vector.
+
+Using the same sparse representation of features, we present an example of the features used by Model 2. This involves two step: (1) construct the count-of-word representation of the feature vector (see Table \ref{tab:countofword}); (2) trim/remove the highly repetitive words/features  and set the value of all remaining features to one (see Table \ref{tab:model2sparse}).
+
+
+
+
+\subsection{Efficient Computation of the Dot-Product}
+
+In simple linear models like logistic regression, the computation is often dominated by the dot-product $\thetav^T \xv$ of the parameters $\thetav \in \Rb^M$ with the feature vector $\xv \in \Rb^M$ . When a dense representation of $\xv$ (such as that shown in Table \ref{tab:model1dense}) is used, this dot-product requires $O(M)$ computation. Why? Because the dot-product requires a sum over each entry in the vector:
+\begin{align}
+\thetav^T \xv = \sum_{m=1}^M \theta_m x_m
+\end{align}
+%
+However, if our feature vector is represented sparsely, we can observe that the only elements of the feature vector that will contribute a non-zero value to the sum are those where $x_m \neq 0$, since this would allow $\theta_m x_m$ to be nonzero. As such, we can write the dot-product as below:
+\begin{align}
+\thetav^T \xv = \sum_{m \in \{1,\ldots,M\} \text{ s.t. } x_m \neq 0} \theta_m x_m
+\label{eq:fastdot}
+\end{align}
+This requires only computation proportional to the number of non-zero entries in $\xv$, which is generally very small for Model 1 and Model 2 compared to the size of the vocabulary. To ensure that your code runs quickly it is best to write the dot-product in the latter form (Equation \eqref{eq:fastdot}).
+
+\subsection{Data Structures for Fast Dot-Product}
+
+Lastly, there is a question of how to implement this dot-product efficiently in practice. The key is choosing appropriate data structures. The most common approach is to choose a dense representation for $\thetav$. In C++ or Java, you could choose an array of \lstinline{float} or \lstinline{double}. In Python, you could choose a \lstinline{numpy} array or a list. 
+
+To represent your feature vectors, you might need multiple data structures. First, you could create a shared mapping from a feature  name (e.g. {\tt apple} or {\tt boy}) to the corresponding index in the dense parameter vector. This shared mapping has already been provided to you in the \lstinline{dict.txt}, and you can extract the index of the word from the dictionary file for all later computation. In fact, you should be able to construct the dictionary on your own from the training data (we have done this step for you in the handout). Once you know the size of this mapping (which is the size of the dictionary file), you know the size of the parameter vector $\thetav$. 
+
+Another data structure should be used to represent the feature vectors themselves. This assignment use the option to directly store a mapping from the integer index in the dictionary mapping (i.e. the index $m$) to the value of the feature $x_m$. Only the indexs of words satisfying certain conditions will be stored, and all other indexs are implies to have zero value of the feature $x_m$. This structure option will ensure that your code runs fast so long as you are doing an efficient computation instead of the $O(M)$ version.
+
+\paragraph{Note for out-of-vocabulary features} The dictionary in the handout is made from the same training data in the large data set. You may encounter some words in the validation data and the test data that do not appear in the vocabulary mapping. In this assignment, you should ignore those words during prediction and evaluation.
+
+
+\begin{table}[p]
+    \centering
+%
+\begin{tabular}{cll}
+\toprule
+{\bf example index} $i$  & {\bf sentiment $y^{(i)}$ } & {\bf review text $\x^{(i)}$ }\\
+\midrule
+1 & pos & apple boy , cat dog \\
+2 & pos & boy boy : dog dog ; dog dog . dog egg egg \\
+3 & neg & apple apple apple apple boy cat cat dog \\
+4 & neg & egg fish \\
+
+\bottomrule
+\end{tabular}
+%
+    \caption{Abstract representation of the input file format.  The $i$th row of this file will be used to construct the $i$th training example using either Model 1 features (Table \ref{tab:model1sparse}) or Model 2 features (Table \ref{tab:model2sparse}).}
+    \label{tab:inputfile}
+\end{table}
+
+
+\begin{table}[p]
+    \centering
+%
+\begin{tabular}{clllllllllllll}
+\toprule
+$i$ & {\bf label} $y^{(i)}$ & \multicolumn{12}{l}{ {\bf features} $\xv^{(i)}$  }\\
+& & \rot{\tt zoo} & \rot{$\ldots$} & \rot{\tt apple} & \rot{\tt boy} & \rot{\tt cat} & \rot{\tt dog} & \rot{\tt egg} & \rot{\tt fish} & \rot{\tt girl} & \rot{\tt head} & \rot{$\ldots$} & \rot{\tt zero} \\
+\midrule
+1 & 1                    & 0 & $\ldots$ & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & $\ldots$ & 0 \\ 
+2 & 1                    & 0 & $\ldots$ & 0 & 1 & 0 & 1 & 1 & 0 & 0 & 0 & $\ldots$ & 0 \\ 
+3 & 0                    & 0 & $\ldots$ & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & $\ldots$ & 0 \\ 
+4 & 0                    & 0 & $\ldots$ & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & $\ldots$ & 0 \\ 
+
+\bottomrule
+\end{tabular}
+%
+    \caption{Dense feature representation for Model 1 corresponding to the input file in Table \ref{tab:inputfile}. The $i$th row corresponds to the $i$th training example. Each dense feature has the size of the vocabulary in the dictionary. Punctuations are excluded.}
+    \label{tab:model1dense}
+\end{table}
+
+
+\begin{table}[p]
+    \centering
+%
+\begin{tabular}{cll}
+\toprule
+$i$ & {\bf label} $y^{(i)}$ & {\bf features} $\xv^{(i)}$ \\
+\midrule
+1 & 1 &  \{ index[``{\tt apple}'']: 1, index[``{\tt boy}'']: 1, index[``{\tt cat}'']: 1, index[``{\tt dog}'']: 1 \} \\
+2 & 1 & \{ index[``{\tt boy}'']: 1, index[``{\tt dog}'']: 1, index[``{\tt egg}'']: 1 \} \\
+3 & 0 & \{ index[``{\tt apple}'']: 1, index[``{\tt boy}'']: 1, index[``{\tt cat}'']: 1, index[``{\tt dog}'']:1 \} \\
+4 & 0 & \{ index[``{\tt egg}'']: 1, index[``{\tt fish}'']: 1 \} \\
+
+\bottomrule
+\end{tabular}
+%
+    \caption{Sparse feature representation (bag-of-word representation) for Model 1 corresponding to the input file in Table \ref{tab:inputfile}.}
+    \label{tab:model1sparse}
+\end{table}
+
+
+
+
+\begin{table}[p]
+    \centering
+%
+\begin{tabular}{cll}
+\toprule
+$i$ & {\bf label} $y^{(i)}$ & {\bf features} $\xv^{(i)}$ \\
+\midrule
+1 & 1 &  \{ index[``{\tt apple}'']: 1, index[``{\tt boy}'']: 1, index[``{\tt cat}'']: 1, index[``{\tt dog}'']: 1 \} \\
+2 & 1 & \{ index[``{\tt boy}'']: 2, index[``{\tt dog}'']: 5, index[``{\tt egg}'']: 2 \} \\
+3 & 0 & \{ index[``{\tt apple}'']: 4, index[``{\tt boy}'']: 1, index[``{\tt cat}'']: 2, index[``{\tt dog}'']: 1 \} \\
+4 & 0 & \{ index[``{\tt egg}'']: 1, index[``{\tt fish}'']: 1 \} \\
+\bottomrule
+\end{tabular}
+%
+    \caption{Count of word representation  for Model 2 corresponding to the input file in Table \ref{tab:inputfile}. }
+    \label{tab:countofword}
+\end{table}
+
+\begin{table}[p]
+    \centering
+%
+\begin{tabular}{cll}
+\toprule
+$i$ & {\bf label} $y^{(i)}$ & {\bf features} $\xv^{(i)}$ \\
+\midrule
+1 & 1 &  \{ index[``{\tt apple}'']: 1, index[``{\tt boy}'']: 1, index[``{\tt cat}'']: 1, index[``{\tt dog}'']: 1 \} \\
+2 & 1 & \{ index[``{\tt boy}'']: 1,  index[``{\tt egg}'']:1 \} \\
+3 & 0 & \{  index[``{\tt boy}'']: 1, index[``{\tt cat}'']: 1, index[``{\tt dog}'']: 1 \} \\
+4 & 0 & \{ index[``{\tt egg}'']: 1, index[``{\tt fish}'']: 1 \} \\
+\bottomrule
+\end{tabular}
+%
+    \caption{Sparse feature representation for Model 2 corresponding to the input file in Table \ref{tab:inputfile}. Assume that the trimming threshold is 4. As a result, "dog" in example 2 and "apple" in example 3 are removed and the value of all remaining features are reset to value 1.}
+    \label{tab:model2sparse}
+\end{table}
+
+
+\end{document}
+
+
+
+
