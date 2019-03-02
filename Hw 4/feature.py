@@ -11,14 +11,14 @@ import copy
 #########################################################################
 
 def model_1_format(d,data,output):
-    appeared_words = set()
     for line in data.splitlines():
+        appeared_words = set()
         labelSplit = line.split("\t")
         label,words = labelSplit[0],labelSplit[1]
-        output.write("%d\t" % label)
+        output.write("%s\t" % label)
         for word in words.split(" "):
             if ((word in d) and (word not in appeared_words)):
-                output.write("%d:1\t" % d[word])
+                output.write("%s:1\t" % d[word])
                 appeared_words.add(word)
         output.write("\n")
     return None
@@ -36,12 +36,12 @@ def model_2_format(d,data,output):
     for line in data.splitlines():
         labelSplit = line.split("\t")
         label,words = labelSplit[0],labelSplit[1]
-        output.write("%d\t" % label)
+        output.write("%s\t" % label)
         for word in words.split(" "):
             if word not in data_words: data_words[word] = 1
             else: data_words[word] += 1
         for word in data_words:
-            if (data_words[word] < t): output.write("%d:1\t" % d[word])
+            if (data_words[word] < t): output.write("%s:1\t" % d[word])
         output.write("\n")
     return None
 
