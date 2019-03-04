@@ -10,9 +10,9 @@ import math
 #########################################################################
 
 def dot(v1,v2):
-    res = 0
+    res = v1[0] #bias term
     for idx in v2:
-        res += v1[idx]
+        res += v1[idx+1]
     return res
 
 def onlyIndex(xi):
@@ -35,14 +35,14 @@ def sgd(training_ex,theta):
     splited = training_ex.split("\t") #[yi,x1,x2,x3,...,xN]
     yi = int(splited[0])
     xi = splited[1:-1]
-    xi = [1]+onlyIndex(xi) #bias term
+    xi = onlyIndex(xi)
     dotProd = dot(theta,xi)
-    for j in range(len(xi)):
-        idx = xi[j]
-        nxj = learning_rate
-        eDotProd = math.exp(dotProd)
-        denom = 1 + (eDotProd)
-        theta[idx] += nxj * (yi - (eDotProd / denom))
+    nxj = learning_rate
+    eDotProd = math.exp(dotProd)
+    denom = 1 + (eDotProd)
+    theta[0] += nxj * (yi - (eDotProd / denom)) #bias
+    for idx in xi:
+        theta[idx+1] += nxj * (yi - (eDotProd / denom))
     return theta
 
 #########################################################################
@@ -64,12 +64,11 @@ def format_dict(data):
 #########################################################################
 
 def predict(xi,theta):
-    p = 0
-    for i in range(len(xi)):
-        idx = xi[i]
-        p += theta[idx]
+    u = dot(theta,xi)
+    p = 1 / (1 + math.exp(-u))
     if (p > 0.5): return 1
     else : return 0
+
 
 #########################################################################
 # Main Function
@@ -116,13 +115,12 @@ if __name__ == "__main__" :
 ####################################################################
 # Testing
 ####################################################################
-    #theta is updated for train data now
     wrongCount = 0
     for ex in train_data:
         splited = ex.split("\t") #[yi,x1,x2,x3,...,xN]
         yi = int(splited[0])
         xi = splited[1:-1]
-        xi = [1]+onlyIndex(xi)
+        xi = onlyIndex(xi)
         expected_outcome = predict(xi,theta)
         actual_outcome = yi
         train_out.write("%d" % expected_outcome + "\n")
@@ -134,10 +132,10 @@ if __name__ == "__main__" :
         splited = ex.split("\t") #[yi,x1,x2,x3,...,xN]
         yi = int(splited[0])
         xi = splited[1:-1]
-        xi = [1]+onlyIndex(xi)
+        xi = onlyIndex(xi)
         expected_outcome = predict(xi,theta)
         actual_outcome = yi
-        train_out.write("%d" % expected_outcome + "\n")
+        test_out.write("%d" % expected_outcome + "\n")
         if (expected_outcome != actual_outcome): wrongCount += 1
     test_error = wrongCount / len(test_data)
 
