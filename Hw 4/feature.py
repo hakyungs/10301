@@ -1,7 +1,5 @@
 from __future__ import division
 import sys
-import math
-import copy
 
 #########################################################################
 # model_1_format
