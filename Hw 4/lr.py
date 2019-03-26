@@ -62,13 +62,18 @@ def format_dict(data):
 #########################################################################
 # predict(xi,theta)
 #########################################################################
-
+'''
 def predict(xi,theta):
     u = dot(theta,xi)
     p = 1 / (1 + math.exp(-u))
     if (p > 0.5): return 1
     else : return 0
+'''
 
+def predict(xi,theta):
+    u = dot(theta,xi)
+    if (u > 0): return 1
+    else: return 0
 
 #########################################################################
 # Main Function
@@ -120,6 +125,7 @@ if __name__ == "__main__" :
         splited = ex.split("\t") #[yi,x1,x2,x3,...,xN]
         yi = int(splited[0])
         xi = splited[1:-1]
+        print(xi)
         xi = onlyIndex(xi)
         expected_outcome = predict(xi,theta)
         actual_outcome = yi
