@@ -1,0 +1,826 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm, enumerate, framed, graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{bm}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{float}
+\setlength{\marginparwidth}{2.15cm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{enumerate}
+\usepackage{epsfig}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{hyperref}
+\usepackage[normalem]{ulem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[font=scriptsize]{subcaption}
+\usepackage{float}
+%\usepackage[]{algorithm2e}
+\usepackage{environ}
+\usepackage{bbm}
+\usepackage[normalem]{ulem}
+\usepackage{color}
+\usepackage{minted}
+\usepackage{tabu}
+\usepackage[utf8]{inputenc}
+\usepackage{array}
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage[final]{listings}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{datetime}
+\usepackage{cancel}
+\usepackage[many]{tcolorbox}
+%\usepackage{xcolor}
+\newcommand{\blackcircle}{\tikz\draw[black,fill=black] (0,0) circle (1ex);}
+\renewcommand{\circle}{\tikz\draw[black] (0,0) circle (1ex);}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code highlighting with listings         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{bluekeywords}{rgb}{0.13,0.13,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.9,0,0}
+\definecolor{light-gray}{gray}{0.95}
+
+\newcommand{\MYhref}[3][blue]{\href{#2}{\color{#1}{#3}}}%
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstdefinelanguage{Shell}{
+  keywords={tar, cd, make},
+  %keywordstyle=\color{bluekeywords}\bfseries,
+  alsoletter={+},
+  ndkeywords={python, py, javac, java, gcc, c, g++, cpp, .txt, octave, m, .tar},
+  %ndkeywordstyle=\color{bluekeywords}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  %stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]",
+  backgroundcolor = \color{light-gray}
+}
+
+\lstset{columns=fixed, basicstyle=\ttfamily,
+    backgroundcolor=\color{light-gray},xleftmargin=0.5cm,frame=tlbr,framesep=4pt,framerule=0pt}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Custom box for highlights               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Define box and box title style
+\tikzstyle{mybox} = [fill=blue!10, very thick,
+    rectangle, rounded corners, inner sep=1em, inner ysep=1em]
+
+\NewEnviron{notebox}{
+\begin{tikzpicture}
+\node [mybox] (box){
+    \begin{minipage}{\textwidth}
+        \BODY
+    \end{minipage}
+};
+\end{tikzpicture}
+}
+
+\makeatletter
+\newcommand{\removelatexerror}{\let\@latex@error\@gobble}
+\makeatother
+
+\newcommand{\argmax}{\mathop{\mathrm{argmax}}}
+\newcommand{\argmin}{\mathop{\mathrm{argmin}}}
+\newcommand{\Pb}{\mathbb{P}}
+\newcommand{\xv}{\mathbf{x}}
+
+
+\begin{document}
+
+\section*{}
+\begin{center}
+  \centerline{\textsc{\LARGE Homework 7}}
+  \vspace{0.5em}
+  \centerline{\textsc{\LARGE Hidden Markov Models}}
+  \vspace{1em}
+  \textsc{\large CMU 10-601: Machine Learning (Spring 2019)} \\
+  \url{}
+  \centerline{OUT: 03/29/2019}
+  \centerline{DUE: 04/10/2019 11:59 PM}
+    \centerline{TAs: Longxiang Zhang, Subhodeep Mitra, Weng Shian Ho, Jiaqi Liu}
+\end{center}
+
+
+\begin{notebox}
+\paragraph{Summary} In this assignment you will implement a new named entity recognition system using Hidden Markov Models. You will begin by going through some multiple choice warm-up problems to build your intuition for these models and then use that intuition to build your own HMM models.
+\end{notebox}
+
+\section*{START HERE: Instructions\footnote{Compiled on \today{} at \currenttime{}}}
+\begin{itemize}
+
+\item \textbf{Collaboration Policy}: Collaboration on solving the homework is allowed, after you have thought about the problems on your own. It is also OK to get clarification (but not solutions) from books or online resources, again after you have thought about the problems on your own. There are two requirements: first, cite your collaborators fully and completely (e.g., ``Jane explained to me what is asked in Question 3.4''). Second, write your solution {\em independently}: close the book and all of your notes, and send collaborators out of the room, so that the solution comes from you only.  See the collaboration policy on the website for more information: \url{http://www.cs.cmu.edu/~mgormley/courses/10601/about.html}
+\item\textbf{Late Submission Policy:} See the late submission policy
+  here:
+  \url{http://www.cs.cmu.edu/~mgormley/courses/10601/about.html}
+
+\item\textbf{Submitting your work:} You will use Gradescope to submit
+  answers to all questions, and Autolab to submit your code. Please
+  follow instructions at the end of this PDF to correctly submit all your code to Autolab.
+
+  \begin{itemize}
+    
+  % COMMENT IF NOT USING CANVAS
+\begin{comment}
+  \item \textbf{Canvas:} Canvas (\url{https://canvas.cmu.edu}) will be
+    used for quiz-style problems (e.g. multiple choice, true / false,
+    numerical answers). Grading is done automatically.
+    %
+    You may only \textbf{submit once} on canvas, so be sure of your
+    answers before you submit. However, canvas allows you to work on
+    your answers and then close out of the page and it will save your
+    progress.  You will not be granted additional submissions, so
+    please be confident of your solutions when you are submitting your
+    assignment.
+    %
+    {\color{red} The above is true for future assignments, but this one
+    allows {\bf unlimited submissions}.}
+\end{comment}
+    
+  % COMMENT IF NOT USING GRADESCOPE
+   \item \textbf{Gradescope:} For written problems such as derivations,
+       proofs, or plots we will be using Gradescope
+       (\url{https://gradescope.com/}). Submissions can be handwritten, but
+       should be labeled and clearly legible. If your writing is not
+       legible, you will not be awarded marks. Alternatively, submissions
+       can be written in LaTeX. Upon submission, label each question
+       using the template provided. Regrade requests can be made, however
+       this gives the TA the opportunity to regrade your entire paper,
+       meaning if additional mistakes are found then points will be
+       deducted.
+       %   
+       Each derivation/proof should be  completed on a separate page.
+
+  %   COMMENT IF NOT USING AUTOLAB
+  \item \textbf{Autolab:} You will submit your code for programming
+    questions on the homework to Autolab
+    (\url{https://autolab.andrew.cmu.edu/}). After uploading your code,
+    our grading scripts will autograde your assignment by running your
+    program on a virtual machine (VM). 
+    %
+    The software installed on the VM is identical to that on
+    \texttt{linux.andrew.cmu.edu}, so you should check that your code
+    runs correctly there. If developing locally, check that the
+    version number of the programming language environment
+    (e.g. Python 2.7, Octave 3.8.2, OpenJDK 1.8.0, g++ 4.8.5) and
+    versions of permitted libraries (e.g. \texttt{numpy} 1.7.1) match
+    those on \texttt{linux.andrew.cmu.edu}.
+    % 
+    Octave users: Please make sure you do not use any
+    Matlab-specific libraries in your code that might make it fail
+    against our tests.
+    %
+    Python3 users: Please include a blank file called python3.txt (case-sensitive) in your tar submission. 
+    %
+    You have a {\bf total of 10 Autolab submissions}. Use them
+    wisely. In order to not waste Autolab submissions, we recommend
+    debugging your implementation on your local machine (or the linux
+    servers) and making sure your code is running correctly first
+    before any Autolab submission. 
+    %
+
+  \end{itemize}
+  
+\item\textbf{Materials:} Download from autolab the tar file ("Download
+  handout"). The tar file will contain all the data that you will need in order to complete this assignment.
+
+\end{itemize}
+
+For multiple choice or select all that apply questions, shade in the box or circle in the template document corresponding to the correct answer(s) for each of the questions. For \LaTeX users, use $\blacksquare$ and $\blackcircle$  for shaded boxes and circles, and don't change anything else.
+
+\clearpage
+
+\section*{Instructions for Specific Problem Types}
+
+For ``Select One" questions, please fill in the appropriate bubble completely:
+
+\begin{quote}
+\textbf{Select One:} Who taught this course?
+\begin{list}{}
+     \item $\blackcircle$ Matt Gormley
+     \item $\circle$ Marie Curie
+     \item $\circle$ Noam Chomsky
+\end{list}
+\end{quote}
+
+If you need to change your answer, you may cross out the previous answer and bubble in the new answer:
+
+\begin{quote}
+\textbf{Select One:} Who taught this course?
+\begin{list}{}
+     \item $\blackcircle$ Matt Gormley
+     \item $\circle$ Marie Curie\\
+     \xcancel{$\blackcircle$}{} Noam Chomsky
+\end{list}
+\end{quote}
+
+
+For ``Select all that apply" questions, please fill in all appropriate squares completely:
+
+\begin{quote}
+\textbf{Select all that apply:} Which are scientists?
+    \begin{list}{}
+    \item $\blacksquare$ Stephen Hawking 
+    \item $\blacksquare$ Albert Einstein
+    \item $\blacksquare$ Isaac Newton
+    \item $\square$ I don't know
+\end{list}
+\end{quote}
+
+Again, if you need to change your answer, you may cross out the previous answer(s) and bubble in the new answer(s):
+
+\begin{quote}
+\textbf{Select all that apply:} Which are scientists?
+    \begin{list}{}
+    \item $\blacksquare$ Stephen Hawking 
+    \item $\blacksquare$ Albert Einstein
+    \item $\blacksquare$ Isaac Newton\\
+    \xcancel{$\blacksquare$} I don't know
+\end{list}
+\end{quote}
+
+For questions where you must fill in a blank, please make sure your final answer is fully included in the given space. You may cross out answers or parts of answers, but the final answer must still be within the given space.
+
+\begin{quote}
+\textbf{Fill in the blank:} What is the course number?
+
+\begin{tcolorbox}[fit,height=1cm, width=4cm, blank, borderline={1pt}{-2pt},nobeforeafter]
+    \begin{center}\huge10-601\end{center}
+    \end{tcolorbox}\hspace{2cm}
+    \begin{tcolorbox}[fit,height=1cm, width=4cm, blank, borderline={1pt}{-2pt},nobeforeafter]
+    \begin{center}\huge10-\xcancel{7}601\end{center}
+    \end{tcolorbox}
+\end{quote}
+
+
+\clearpage
+
+\section{Written Questions [20 pts]}
+\subsection{Multiple Choice [10 pts]}
+In this section we will test your understanding of several aspects of HMMs.
+%
+Shade in the box or circle in the template document corresponding to the correct answer(s) for each of the questions below. 
+
+
+\begin{enumerate}
+\item (2 points. \textbf{Select all that apply}) Which of the following are true under the (first-order) Markov assumption in an HMM: 
+\begin{list}{}{}
+\item $\square$ The states are independent
+\item $\square$ The observations are independent
+\item $\square$ $y_t \perp y_{t-1} | y_{t-2}$
+\item $\square$ $y_t \perp y_{t-2} | y_{t-1}$
+\item $\square$ None of the above
+\end{list}
+
+\item (2 points. \textbf{Select all that apply}) Which of the following independence assumptions hold in an HMM:
+\begin{list}{}{}
+\setlength\itemsep{-1.5em}
+\item $\square$ The current observation $x_t$ is conditionally independent of all other observations given the current state $y_t$\\
+\item $\square$ The current observation $x_t$ is conditionally independent of all other states given the current state $y_t$\\
+\item $\square$ The current state $y_t$ is conditionally independent of all states given the previous state $y_{t-1}$\\
+\item $\square$ The current observation $x_t$ is conditionally independent of $x_{t-2}$ given the previous observation $x_{t-1}$.\\
+\item $\square$ None of the above
+\end{list}
+
+\end{enumerate}
+
+In the remaining questions you will always see two quantities and decide what is the strongest relation between them. (? means it's not possible to assign any true relation). As such there is \textbf{only one correct answer}.
+
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item (2 points. Select one) What is the relation between $\sum_{i=0}^{N-1}(\alpha_5(i)*\beta_5(i))$ and $P(\xv)$? Select only the \textbf{strongest} relation that necessarily holds.
+\begin{list}{}{}
+\setlength\itemsep{-1.5em}
+\item $\bigcirc$ $=$\\
+\item $\bigcirc$ $>$\\
+\item $\bigcirc$ $<$\\
+\item $\bigcirc$ $\leq$\\
+\item $\bigcirc$ $\geq$\\
+\item $\bigcirc$ $?$\\
+\end{list}
+
+\item(2 points. Select one) What is the relation between $P(y_4=s_1, y_5=s_2, \xv)$ and $\alpha_4(s_1) \cdot \beta_5(s_2)$? Select only the \textbf{strongest} relation that necessarily holds.
+\begin{list}{}{}
+\setlength\itemsep{-1.5em}
+\item $\bigcirc$ $=$\\
+\item $\bigcirc$ $>$\\
+\item $\bigcirc$ $<$\\
+\item $\bigcirc$ $\leq$\\
+\item $\bigcirc$ $\geq$\\
+\item $\bigcirc$ $?$\\
+\end{list}
+
+\item (2 points. Select one) What is the relation between $\alpha_5(i)$ and $\beta_5(i)$? Select only the \textbf{strongest} relation that necessarily holds.
+\begin{list}{}{}
+\setlength\itemsep{-1.5em}
+\item $\bigcirc$ $=$\\
+\item $\bigcirc$ $>$\\
+\item $\bigcirc$ $<$\\
+\item $\bigcirc$ $\leq$\\
+\item $\bigcirc$ $\geq$\\
+\item $\bigcirc$ $?$\\
+\end{list}
+
+\end{enumerate}
+\subsection{Warm-up Exercise: Forward-Backward Algorithm [4 pts]}\label{toy}
+% working example [4 points]
+% write the example
+To help you prepare to implement the HMM forward-backward algorithm (see Section~\ref{forback} for a detailed explanation), we have provided a small example for you to work through by hand. This toy data set consists of a training set of three sequences with three unique words and two tags and a test set with a single sequence composed of the same unique words used in the training set. Before going through this example, please carefully read the algorithm description in Sections \ref{learn} and \ref{forback}.
+
+Training set:
+\begin{verbatim}
+you_B eat_A fish_B
+you_B fish_B eat_A
+eat_A fish_B
+\end{verbatim}
+
+Where the training word sequences are:
+$$
+x= 
+\begin{bmatrix}
+you & eat & fish\\
+you & fish & eat\\
+eat & fish &
+\end{bmatrix}
+$$
+
+And the corresponding tags are:
+$$
+y= 
+\begin{bmatrix}
+B & A & B\\
+B & B & A\\
+A & B &
+\end{bmatrix}
+$$
+
+
+Test set:
+\begin{verbatim}
+fish eat you
+\end{verbatim}
+
+or 
+
+$$
+x= 
+\begin{bmatrix}
+fish & eat & you\\
+\end{bmatrix}
+$$
+
+The following four questions are meant to encourage you to work through the forward backward algorithm by hand using this test example. Feel free to use a calculator, being careful to carry enough significant figures through your computations to avoid rounding errors. For each question below, please report the requested value in the text box next to the question (these boxes are only visible in the template document). When a number is requested, only write the number in the box. When a word/tag is requested, only write that word or tag. \textbf{DO NOT} include explanations or derivation work in the text box. Points will be deducted if anything else is included in the box.
+
+\clearpage
+
+\begin{enumerate}
+    \item (1 point) Compute $\alpha_2(A)$, the $\alpha$ value associated with the tag ``A'' for the second word in the test sequence. Please round your answer to \textbf{THREE} decimal places.
+    
+    \begin{tcolorbox}[fit,height=1cm, width=2cm, blank, borderline={1pt}{-2pt}]
+            %solution 
+        \end{tcolorbox}
+    
+
+    \item (1 point) Compute $\beta_2(B)$, the $\beta$ value associated with the tag ``B'' for the second word in the test sequence. Please round your answer to \textbf{THREE} decimal places.
+    
+    \begin{tcolorbox}[fit,height=1cm, width=2cm, blank, borderline={1pt}{-2pt}]
+            %solution 
+        \end{tcolorbox}
+    
+    \item (1 point) Predict the tag for the third word in the test sequence. 
+    
+    \begin{tcolorbox}[fit,height=1cm, width=2cm, blank, borderline={1pt}{-2pt}]
+            %solution 
+        \end{tcolorbox}
+    
+    \item (1 point) Compute the log-likelihood for the entire test sequence, ``\texttt{fish eat you}". Please round your answer to \textbf{THREE} decimal places.
+    
+    \begin{tcolorbox}[fit,height=1cm, width=2cm, blank, borderline={1pt}{-2pt}]
+            %solution 
+        \end{tcolorbox}
+    
+\end{enumerate}
+% compute alpha_4 for the test example
+
+% compute beta 2 for the test example
+
+% Predict the tag for the third word in the test example
+
+% Compute the log-likelihood for the entire test sequence.
+
+\clearpage
+
+\subsection{Empirical Questions [6 pts]}
+[Return to these questions after implementing your \texttt{learnhmm.\{py|java|cpp|m\}} and \texttt{forwardbackward.\{py|java|cpp|m\}} functions]
+
+Using the fulldata set \textbf{trainwords.txt} in the handout using your implementation of \texttt{learnhmm.\{py|java|cpp|m\}} to learn parameters for an hmm model using the first 10, 100, 1000, and 10000 sequences in the file.
+Use these learned parameters perform prediction on the \textbf{trainwords.txt} and the \textbf{testwords.txt} files using your \texttt{forwardbackward.\{py|java|cpp|m\}}.
+Construct a plot with number of sequences used for training on the x-axis (log-scale) and average log likelihood across all sequences from the \textbf{trainwords.txt} or the \textbf{testwords.txt} on the y-axis (see Section~\ref{forback} for details on computing the log data likelihood for a sequence). Each table entry is worth 0.5 points. 
+Write the resulting log likelihood values in the table in the template.
+Include your plot in the large box in the template (2 points).
+To receive credit for your plot, you must submit a computer generated plot.
+\textbf{DO NOT} hand draw your plot.
+
+\begin{table}[h]
+    \center
+    \begin{tabular}{|m{2cm}|m{3cm}|m{3cm}|}
+    \hline
+    \#sequences & Train average log-likelihood & Test average log-likelihood \\ \hline
+    10         &    &  \\ \hline
+    100        &    &  \\ \hline
+    1000       &    &  \\ \hline
+    10000      &    &  \\ \hline
+    \end{tabular}
+    \end{table}
+
+ \begin{tcolorbox}[fit,height=13cm, width=17cm, blank, borderline={1pt}{-2pt}]
+    %solution 
+ \end{tcolorbox}
+
+% plot [6 points]
+
+\subsection{Collaboration Policy}
+After you have completed all other components of this assignment, report your answers to the collaboration policy questions detailed in the Academic Integrity Policies found \href{http://www.cs.cmu.edu/~mgormley/courses/10601/about.html}{here}.
+    \begin{enumerate}
+        \item Did you receive any help whatsoever from anyone in solving this assignment? Is so, include full details.
+        \item Did you give any help whatsoever to anyone in solving this assignment? Is so, include full details.
+        \item Did you find or come across code that implements any part of this assignment ? If so, include full details.
+    \end{enumerate}
+
+\begin{tcolorbox}[fit,height=10cm, width=17cm, blank, borderline={1pt}{-2pt}]
+    %solution 
+    \end{tcolorbox}
+
+\clearpage
+
+\section{Programming [80 pts]}
+\label{programming}
+
+\subsection{The Tasks and Data Sets}\label{dataset}
+The handout file for this assignments contains several files that you will use in the homework. The contents and formatting of each of these files is explained below.
+\begin{enumerate}
+
+\item \textbf{trainwords.txt} This file contains labeled text data that you will use in training your model in the \textbf{Learning} problem. Specifically the text contains one sentence per line that has already been preprocessed, cleaned and tokenized. You should treat every line as a separate sequence and assume that it has the following format:
+
+    \texttt{<Word0>\_<Tag0> <Word1>\_<Tag1> ... <WordN>\_<TagN>}
+
+where every \texttt{<WordK>\_<TagK>} unit token is separated by white space.
+
+\item \textbf{testwords.txt}: This file contains labeled data that you will use to evaluate your model in the \textbf{Experiments} section. This file contains the gold standard labels.  This file has the same format as \textbf{trainwords.txt}.
+    
+\item \textbf{index\_to\_word.txt} and \textbf{index\_to\_tag.txt}: These files contain a list of all words or tags that appear in the data set. In your functions, you will convert the string representation of words or tags to indices corresponding to the location of the word or tag in these files. For example, if Austria is on line 729 of \textbf{index\_to\_word.txt}, then all appearances of Austria in the data sets should be converted to the index 729. This index will also correspond to locations in the parameter matrices. For example, the word Austria corresponds to the parameters in column 729 of the matrix stored in \textbf{hmmemit.txt}. This will be useful for your forward-backward algorithm implementation (see Section~\ref{forback}).
+    
+\item \textbf{toytrain.txt}, \textbf{toytest.txt}, \textbf{toy\_index\_to\_word.txt}, and \textbf{toy\_index\_to\_tag.txt}: These files are analogous to \textbf{trainwords.txt}, \textbf{testwords.txt}, \textbf{index\_to\_word.txt}, and \textbf{index\_to\_tag.txt} and are used to compare your implementation to your hand calculations in Section~\ref{toy}.
+
+\item \textbf{predictedtext.txt} The \textbf{predictedtext.txt} file contains labeled data that you will use to debug your implementation. The labels in this file are not gold standard but are generated by running our decoder using the features from \textbf{trainwords.txt}. This file has the same format as \textbf{trainwords.txt}.
+
+\item \textbf{metrics.txt} The \textbf{metrics.txt} file contains the metrics you will compute for the dataset. For this assignment, you need to compute the average log likelihood and your prediction accuracy on the test data. Note that in Named Entity Recognition, F-1 score is a more common metric to evaluate the model performance, here you only need to report your accuracy for tag prediction of each word. 
+
+Sample metrics file for the toy dataset
+
+
+\item \textbf{hmmtrans.txt, hmmemit.txt and hmmprior.txt}: These files contain pre-trained model parameters of an HMM that you will use in testing your implementation of the \textbf{Learning} and \textbf{Evaluation and Decoding} problems. The format of the first two files are analogous and is as follows. Every line in these files consists of a conditional probability distribution. In the case of transition probabilities, this distribution corresponds to the probability of transitioning into another state, given a current state. Similarly, in the case of emission probabilities, this distribution corresponds to the probability of emitting a particular symbol, given a current state. For example, every line in \textbf{hmmtrans.txt} has the following format:
+    
+    \textbf{hmmtrans.txt}:\\
+    \texttt{<ProbS1S1> ... <ProbS1SN>}\\
+     \texttt{<ProbS2S1> ... <ProbS2SN>}...\\   
+    
+and every line in \textbf{hmmemit.txt} has the following format:
+    
+    \textbf{hmmemit.txt}:\\
+    \texttt{<ProbS1Word1> ... <ProbS1WordN>}\\
+     \texttt{<ProbS2Word1> ... <ProbS2WordN>}...\\
+    
+In both cases, elements in the same row are separated by white space. Each row corresponds to a line of text (using \texttt{\char`\\ n} to create new lines).
+    
+    
+The format of \textbf{hmmprior.txt} is similarly defined except that it only contains a single probability distribution over starting states. Therefore each row only has a single element. Therefore \textbf{hmmprior.txt} has the following format:
+    
+    \textbf{hmmprior.txt}:\\
+    \texttt{<ProbS1>}\\
+     \texttt{<ProbS2>}...\\
+
+%\item \textbf{train-probs.txt} This file contains log-probability values that you will use to debug your implementation of the \textbf{Evaluation and Decoding} problem. Every line in this file is a log-probability value assigned to a sentence in \textbf{trainwords.txt}, under the HMM parameters in \textbf{hmmtrans.txt}, \textbf{hmmemit.txt} and \textbf{hmmprior.txt}. Specifically, the Kth line in \textbf{train-probs.txt} corresponds to the log-probability of the Kth sentence in \textbf{trainwords.txt} under the model parameters.
+
+% explain how to do this and make them write it.
+%\item \textbf{logsum.py} This script contains a function that allows summing of exponentiated logarithmic numbers to a very high degree of precision. It will be useful in your implementation, with regards to the problem of numerical underflow you will likely face. While the sample function is in Python, equivalent Java code should be fairly easy to implement. For example, check out the Java.lang.Math.log1p() method, which is a necessary building block for this function.
+\end{enumerate}
+
+Note that the data provided to you is to help in developing your implementation of the HMM algorithms. Your code will be tested on Autolab using different data with different HMM parameters, likely coming from a different domain although the format will be identical.
+
+\subsection{Learning}\label{learn}
+Your first task is to implement an algorithm to learn the hidden Markov model parameters needed to apply the forward backward algorithm (See Section \ref{forback}). There are three sets of parameters that you will need to estimate: the initialization probabilities {\boldmath$\pi$}, the transition probabilities $\mathbf A$, and the emission probabilities $\mathbf B$. For this assignment, we model each of these probabilities using a multinomial distribution with parameters $ \pi_j=P(y_1=j)$, $ a_{jk} = P(y_{t}=k\vert y_{t-1}=j)$, and $ b_{jk} = P(x_t=k\vert y_{t}=j)$. These can be estimated using maximum likelihood, which results in the following parameter estimators:
+
+\begin{enumerate}
+    \item $P(y_1 = j) = \pi_j = \frac{N_\pi^j+1}{\sum_{p=1}^{J}(N_\pi^p+1)}$, where $N_\pi^j$ equals the number of times state $s_j$ is associated with the first word of a sentence in the training data set.
+    \item $P(y_{t} = k\vert y_{t-1}=j) = a_{jk}= \frac{N_A^{jk}+1}{\sum_{p=1}^J (N_A^{jp}+1)}$, where $N_A^{jk}$ is the number of times state $s_j$ is followed by state $s_k$ in the training data set.  
+    \item $P(x_{t} = k\vert y_{t}=j) = b_{jk}= \frac{N_B^{jk}+1}{\sum_{p=1}^M (N_B^{jp}+1)}$, where $N_B^{jk}$ is the number of times that the state $s_j$ is associated with the word $k$ in the training data set.
+\end{enumerate}
+
+Note that for each count, a ``+1'' is added to make a \textbf{pseudocount}. This is slightly different from pure maximum likelihood estimation, but it is useful in improving performance when evaluating unseen cases during evaluation of your test set.
+
+You should implement a function that reads in the training data set (\textbf{trainwords.txt}), and then estimates $\pi$, $A$, and $B$ using the above maximum likelihood solutions. 
+
+Your outputs should be in the same format as \textbf{hmmprior.txt}, \textbf{hmmtrans.txt}, and \textbf{hmmemit.txt} (including the same number of decimal places to ensure there are no rounding errors during prediction). The autograder will use the following commands to call your function:
+
+\begin{tabbing}
+For Python: \=\texttt{\$ \textbf{python} learnhmm.\textbf{py} [args\dots]}\\
+For Java: \>\texttt{\$ \textbf{javac} -cp "./lib/ejml-v0.33-libs/*:./" learnhmm.\textbf{java};\\ \>  \texttt{\textbf{java} -cp "./lib/ejml-v0.33-libs/*:./" learnhmm [args\dots]}}\\
+For C++: \>\texttt{\$ \textbf{g++} -g -std=c++11 -I./lib learnhmm.\textbf{cpp}; ./a.out [args\dots]}\\
+For Octave: \>\texttt{\$ \textbf{octave} -qH learnhmm.\textbf{m} [args\dots]}
+\end{tabbing}
+
+Where above \texttt{[args\dots]} is a placeholder for six command-line arguments:\texttt{<train\_input>} \texttt{<index\_to\_word>} \texttt{<index\_to\_tag>} \texttt{<hmmprior>} \texttt{<hmmemit>} \texttt{<hmmtrans>}. These arguments are described in detail below:
+\begin{enumerate}
+    \item \texttt{<train\_input>}: path to the training input \texttt{.txt} file (see Section~\ref{dataset})
+    \item \texttt{<index\_to\_word>}: path to the \texttt{.txt} that specifies the dictionary mapping from words to indices. The tags are ordered by index, with the first word having index of 1, the second word having index of 2, etc.
+    \item \texttt{<index\_to\_tag>}: path to the \texttt{.txt} that specifies the dictionary mapping from tags to indices. The tags are ordered by index, with the first tag having index of 1, the second tag having index of 2, etc.
+    \item \texttt{<hmmprior>}: path to output \texttt{.txt} file to which the estimated prior (\boldmath${\pi}$) will be written. The file output to this path should be in the same format as the handout \texttt{hmmprior.txt} (see Section~\ref{dataset}).
+    \item \texttt{<hmmemit>}: path to output \texttt{.txt} file to which the emission probabilities ($\mathbf B$) will be written. The file output to this path should be in the same format as the handout \texttt{hmmemit.txt} (see Section~\ref{dataset})
+    \item \texttt{<hmmtrans>}: path to output \texttt{.txt} file to which the transition probabilities ($\mathbf A$) will be written. The file output to this path should be in the same format as the handout \texttt{hmmtrans.txt} (see Section~\ref{dataset})..
+\end{enumerate}
+
+% Describe counting co-occurring statistics, this should probably be framed in terms of maximum likelihood estimation
+
+\subsection{Evaluation and Decoding}
+\label{forback}
+
+\subsubsection{Forward Backward Algorithm and Minimal Bayes Risk Decoding}
+
+% \begin{notebox}
+% \textbf{Note:} Before you implement the forward-backward algorithm, be sure to carefully read the section on properly avoiding underflow in Section \ref{sec:underflow}. 
+% \end{notebox}
+Your next task is to implement the forward-backward algorithm. Suppose we have a set of sequence consisting of $T$ words, $x_1,...,x_T$. Each word is associated with a label $y_t\in\{1,...,J\}$. In the forward-backward algorithm we seek to approximate $P(y_t | x_1,...,x_T)$ up to a multiplication constant. This is done by first breaking $P(y_t | x_1,...,x_T)$ into a ``forward'' component and a ``backward'' component as follows:
+\begin{align*}
+   P(y_t =s_j | x_1,...,x_T) &\propto P(y_t=s_j,x_{t+1},...,x_T|x_1,...,x_{t})\\
+   &\propto P(y_t=s_j|x_1,...,x_{t})P(x_{t+1},...,x_T|y_t=s_j, x_1,...,x_{t})\\
+    &\propto P(y_t=s_j|x_1,...,x_{t})P(x_{t+1},...,x_T|y_t=s_j)\\ 
+     &\propto P(y_t=s_j, x_1,...,x_{t})P(x_{t+1},...,x_T|y_t=s_j) 
+\end{align*}
+
+
+%\begin{align*}
+%    P(y_t =j | x_1,...,x_T) 
+%    \propto &P(y_t=j, x_1,...,x_{t})
+%\end{align*}
+where $P(y_t=s_j|x_1,...,x_{t})$ is computed by passing forward recursively through the model and $P(x_{t+1},...,x_T|y_t=j)$ is computed by passing recursively backwards through the model.
+
+\textbf{Forward Algorithm}
+%Define $\alpha_t(j)=P(y_{t}=s_j|x_1,...,x_{t})$ as the probability that $y_{t}$ is in state $s_j$ given all observations up to that point in the sequence. We will then rewrite this as follows using Bayes rule:
+%\begin{align*}
+%   \alpha_t(j)&=P(y_{t}=s_j|x_1,...,x_{t})\\
+%   &= \frac{1}{Z_{t}}P(x_{t}|y_{t}=s_j,x_1,...,x_{t-1})P(y_{t}=s_j|x_1,...,x_{t-1})\\
+%   &= \frac{1}{Z_{t}}P(x_{t}|y_{t}=s_j)P(y_{t}=s_j|x_1,...,x_{t-1})\\
+%   &= \frac{1}{Z_{t}}P(x_{t}|y_{t}=s_j)\sum_{k=1}^JP(y_{t}=s_j|y_{t-1}=s_k)P(y_{t-1}=s_k||x_1,...,x_{t-1})\\
+%   &=\frac{1}{Z_{t}}b_j(x_t) \sum_{k=1}^Ja_{kj}\alpha_{t-1}(k)
+%\end{align*}
+%where $Z_{t+1} = \sum_{j = 1}^JP(x_{t}|y_{t}=s_j)P(y_{t}=s_j|x_1,...,x_{t-1})$.
+
+
+Define $\alpha_t(j) = P(y_t = j, x_{1:t})$. We can rearrange our definition of $\alpha_t(j)$ as follows:
+\begin{align*}
+    \alpha_t(j)
+    =&P(y_t=s_j, x_{1:t}) \\
+    =& \sum_{k} P(y_t=s_j, y_{t-1}=s_k, x_{1:t}) \\
+    =& \sum_{k} P(y_{t-1}=s_k, x_{1:t} \vert y_t = s_j) P(y_t = s_j) \\
+    =& \sum_{k} P(x_t \vert y_t = s_j) P(y_{t-1}=s_k, x_{1:t-1} \vert y_t = s_j) P(y_t = s_j) \\
+    =& P(x_t \vert y_t = s_j) \sum_{k} P(y_t = s_j, y_{t-1}=s_k, x_{1:t-1}) \\
+    =& P(x_t \vert y_t = s_j) \sum_{k} P(y_t = s_j, x_{1:t-1} \vert y_{t-1}=s_k) P(y_{t-1}=s_k) \\
+    =& P(x_t \vert y_t = s_j) \sum_{k} P(y_t = s_j \vert y_{t-1}=s_k) P(x_{1:t-1} \vert y_{t-1}=s_k) P(y_{t-1}=s_k) \\
+    =& P(x_t \vert y_t = s_j) \sum_{k} P(y_t = s_j \vert y_{t-1}=s_k) P(y_{t-1}=s_k, x_{1:t-1}) \\
+    =& b_{jx_t} \sum_{k} a_{kj} \alpha_{t-1}(k) \\
+\end{align*}
+
+% need to add a bit about dealing with underflow
+%Using vector notations,
+%$\alpha_t = b(x_t) * \alpha_{t-1}^\top A$,
+%$\beta_t = A (\beta_{t+1} * b(x_{t+1}))$
+
+
+Using this definition, the $\alpha$'s can be computed using the following recursive procedure:
+\begin{enumerate}
+    \item $\alpha_1(j)=\pi_jb_{jx_1}$. 
+    \item For $t > 1$, $\alpha_{t}(j)=b_{jx_{t}}\sum_{k=1}^{J}\alpha_{t-1}(k)a_{kj}$ 
+\end{enumerate}
+
+
+\textbf{Backward Algorithm}
+Define $\beta_t(j) = P(x_{t+1},...,x_T|y_t=s_j)$. We can rearrange our definition of $\beta_t(j)$ as follows:
+
+\begin{align*}
+    \beta_t(j) &= P(x_{t+1},...,x_T|y_t=s_j)\\
+    &= \sum_{k=1}^JP(y_{t+1}=s_k,x_{t+1},...,x_T|y_t=s_j)\\
+    &= \sum_{k=1}^JP(x_{t+1},...,x_T|y_t=s_j,y_{t+1}=s_k)P(y_{t+1}=s_k|y_t=s_j)\\
+    &= \sum_{k=1}^JP(x_{t+1}|y_{t+1}=s_k)P(x_{t+2},...,x_T|y_{t+1}=s_k)P(y_{t+1}=s_k|y_t=s_j)\\
+    &= \sum_{k=1}^J b_{kx_{t+1}}\beta_{t+1}(k)a_{jk}
+\end{align*}
+
+
+Just like the $\alpha$'s, the $\beta$'s can also be computed using the following backward recursive procedure:
+
+\begin{enumerate}
+    \item $\beta_T(j) = 1$ (All states could be ending states)
+    \item  For $1\leq t <T$, $\beta_t(j) = \sum_{k=1}^{J}b_{kx_{t+1}}\beta_{t+1}(k)a_{jk}$ (Generate $x_{t+1}$ from any state)
+\end{enumerate}
+
+
+\textbf{Forward-Backward Algorithm}
+As stated above, the goal of the Forward-Backward algorithm is to compute $P(y_t =s_j | x_1,...,x_T)$. This can be done using the following equation:
+
+$$P(y_t =s_j | x_1,...,x_T) \propto P(y_t=s_j, x_1,...,x_{t})P(x_{t+1},...,x_T|y_t=s_j) $$
+
+After running your forward and backward passes through the sequence, you are now ready to estimate the conditional probabilities as:
+
+$$P(y_t | x_1,...,x_T) \propto \alpha_t\circ\beta_t$$
+where $\circ$ is the element-wise product.
+
+\textbf{Minimum Bayes Risk Prediction}
+We will assign tags using the minimum Bayes risk predictor, defined for this problem as follows:
+
+$$\hat{y}_t = \argmax_{j\in \{1,...,J\}} P(y_t = s_j\vert x_1,...,x_T)$$
+
+To resolve ties, select the tag that appears earlier in the \texttt{<index\_to\_tag>} input file.
+
+\textbf{Computing the Log Likelihood of a Sequence}
+When we compute the log likelihood of a sequence, we are interested in the computing the quantity $P(x_1,...,x_T)$. We can rewrite this in terms of values we have already computed in the forward-backward algorithm as follows:
+
+\begin{align*}
+    \log P(x_1,...,x_T) &= \log\big(\sum_j P(x_1,...,x_T,y_T=s_j)\big)\\
+    &= \log\big(\sum_j \alpha_T(j)\big)
+\end{align*}
+
+% TODO: Add in underflow.tex
+%\input{underflow.tex}
+
+\subsubsection{Implementation Details}
+
+% Change the stuff below as follows:
+% 1. the students should implement forward backward, so they need to multiply the state conditional probabilities for each algorithm at each time point
+% 2. need to add stuff about how to assign labels (they assign label with highest probability)
+You should now implement your forward-backward algorithm as a program, \texttt{forwardbackward.\{py|java|cpp|m\}}. The program will read in test data and the parameter files produced by \texttt{learnhmm.\{py|java|cpp|m\}}. The autograder will use the following commands to call your function:
+
+%test_input,index_to_word,index_to_tag,hmmprior,hmmemit,hmmtrans,predicted_file
+\begin{tabbing}
+For Python: \=\texttt{\$ \textbf{python} forwardbackward.\textbf{py} [args\dots]}\\
+For Java: \>\texttt{\$ \textbf{javac} -cp "./lib/ejml-v0.33-libs/*:./" forwardbackward.\textbf{java};\\ \>  \texttt{\textbf{java} -cp "./lib/ejml-v0.33-libs/*:./" forwardbackward [args\dots]}}\\
+For C++: \>\texttt{\$ \textbf{g++} -g -std=c++11 -I./lib forwardbackward.\textbf{cpp}; ./a.out [args\dots]}\\
+For Octave: \>\texttt{\$ \textbf{octave} -qH forwardbackward.\textbf{m} [args\dots]}
+\end{tabbing}
+
+Where above \texttt{[args\dots]} is a placeholder for seven command-line arguments:\texttt{<test\_input>} \texttt{<index\_to\_word>} \texttt{<index\_to\_tag>} \texttt{<hmmprior>} \texttt{<hmmemit>} \texttt{<hmmtrans>} \texttt{<predicted\_file>} \texttt{<metric\_file>}. These arguments are described in detail below:
+\begin{enumerate}
+    \item \texttt{<test\_input>}: path to the test input \texttt{.txt} file that will be evaluated by your forward backward algorithm (see Section~\ref{dataset})
+    \item \texttt{<index\_to\_word>}: path to the \texttt{.txt} that specifies the dictionary mapping from words to indices. The tags are ordered by index, with the first word having index of 1, the second word having index of 2, etc. This is the same file as was described for \texttt{learnhmm.\{py|java|cpp|m\}}.
+    \item \texttt{<index\_to\_tag>}: path to the \texttt{.txt} that specifies the dictionary mapping from tags to indices. The tags are ordered by index, with the first tag having index of 1, the second tag having index of 2, etc. This is the same file as was described for \texttt{learnhmm.\{py|java|cpp|m\}}.
+    \item \texttt{<hmmprior>}: path to input \texttt{.txt} file which contains the estimated prior (\boldmath${\pi}$).
+    \item \texttt{<hmmemit>}: path to input \texttt{.txt} file which contains the emission probabilities ($\mathbf B$).
+    \item \texttt{<hmmtrans>}: path to input \texttt{.txt} file which contains transition probabilities ($\mathbf A$).
+    \item \texttt{<predicted\_file>}: path to the output \texttt{.txt} file to which the predicted tags will be written. The file should be in the same format as the \texttt{<test\_input>} file. 
+    \item \texttt{<metric\_file>}: path to the output \texttt{.txt} file to which the metrics will be written. 
+\end{enumerate}
+
+
+Example command for python users:
+\begin{lstlisting}
+$ python forwardbackward.py toydata/toytrain.txt \
+toydata/toy_index_to_word.txt toydata/toy_index_to_tag.txt hmmprior.txt \
+hmmemit.txt hmmtrans.txt predicted.txt metrics.txt
+\end{lstlisting}
+
+After running the command above, the \texttt{<predicted\_file>} output should be:
+
+\begin{lstlisting}
+you_B eat_A fish_B
+you_B fish_B eat_A
+eat_A fish_B
+\end{lstlisting}
+
+And the \texttt{<metric\_file>} output should be:
+
+\begin{lstlisting}
+Average Log-Likelihood: -0.924531673593
+Accuracy: 1.0
+\end{lstlisting}
+
+Take care that your output has the exact same format as shown above. There should be a single space after the colon preceding the metric value (e.g. a space after \lstinline{Average Log-Likelihood:}). Each line should be terminated by a Unix line ending \lstinline{\n}.
+
+
+
+\subsubsection{Log-Space Arithmetic for Avoiding Underflow}
+\label{sec:underflow}
+
+Handling underflow properly is a critical step in implementing an HMM. For HW7, We highly recommend using the "compute in log-space" trick (see below for details) in your code.
+
+\paragraph{Compute in Log-Space}. 
+
+The arithmetic carried out in the forward and backward algorithms is fairly simple: it is essentially just the multiplication and addition of many probabilities. However, some of these probabilities may become very small, namely the $\alpha_t(j)$ and $\beta_t(j)$ probabilities, and should be stored in memory as log-probabilities, not probabilities. Otherwise, your results may \emph{underflow}. That is, the product of many small probabilities could become too small to represent as a floating-point number, and it may be (incorrectly) rounded down to zero.
+
+The algorithms described above are all written in terms of probabilities, not their logs. In addition to \emph{storing} the $\alpha$'s and $\beta$'s as log-probabilities, you should also update the \emph{computation} so as to avoid underflow. There are two cases to address:
+
+\begin{description}
+\item[multiplication] Suppose the algorithm multiplies two probabilities $p$ and $q$ together to get a third probability $r$. That is, $r = p \cdot q$. Replace this computation with $lr = lp + lq$ where $lr$, $lp$, and $lq$ are variables storing $\log(r)$, $\log(p)$ and $\log(q)$ respectively.
+
+\emph{Note:} The emission and transition probabilities tend to be large enough to represent in memory as probabilities. So, if $q$ is already stored elsewhere as a probability, you can directly compute its log in place: $lr = lp \cdot \log(q)$. 
+
+\item[addition] Suppose the algorithm adds two probabilities $p$ and $q$ to get a third probability $r$. That is, $r = p + q$. Again we will use variables $lr$, $lp$, and $lq$ that store $\log(r)$, $\log(p)$ and $\log(q)$ respectively. 
+
+The \emph{naive} solution here would be to compute $lr = \log(\exp(lp) + \exp(lq))$, but this will just result in underflow of $p = \exp(lp)$ and $q = \exp(lq)$.   
+
+Instead, use the log-sum-exp function to carry out the addition in log-space. Notice below that we only exponentiate the absolute value of the difference between the two log-probabilities, which is unlikely to overflow. 
+\begin{align}
+    \text{logsumexp}(x,y) = \max(x,y) + \log(1 + \exp(-\text{abs}(x - y)))
+\end{align}
+where $\text{abs}(\cdot)$ is the absolute value function.
+Then we compute $lr = \text{logsumexp}(lp, lq)$.
+
+Note that we need to be particularly careful of how we represent zero probabilities. For example, we could represent the $\log(0)$ as $-\infty$ since the standard floating point specification explicitly supports representation of negative infinity. Note however that your code will have to explicitly handle this case; for example, some libraries throw errors when you take the log of zero. A more careful implementation of the logsumexp function is given in Algorithm \ref{alg:logsumexp}. 
+
+\end{description}
+
+%On Autolab, we test your code on sentences that are sufficiently small to ensure that underflow is not an issue if you use 64-bit floats. That is, you can get full credit on Autolab even if you do not explicitly handle underflow. 
+% REMOVED AFTER DATASET WAS UPDATED:
+%However, the empirical questions will push your implementation to the point of underflow and it is therefore necessary to implement it as described above.
+
+\begin{algorithm}[H]
+  \caption{Addition in Log-Space}
+  \label{alg:logsumexp}
+  \begin{algorithmic}[1]
+    \Procedure{logsumexp}{$x, y$}
+        \If{x = $-\infty$}
+            \State \textbf{return} y
+        \EndIf
+        \If{y = $-\infty$}
+            \State \textbf{return} x
+        \EndIf
+        \State $m = \max(x, y)$
+        \State \textbf{return} $m + \log(1 + \exp(- \text{abs}(x - y)))$
+    \EndProcedure
+  \end{algorithmic}
+%   \begin{algorithmic}[1]
+%     \Procedure{logsumexp}{$x_1, x_2, \ldots, x_n$}
+%         \State $m = \max(x_1, x_2, \ldots, x_n)$
+%         \State \textbf{return} $m + \log(\sum_{i=1}^n \exp(x_i - m))$
+%     \EndProcedure
+%   \end{algorithmic}
+\end{algorithm}
+
+\begin{notebox}
+\paragraph{Linear Algebra Libraries} As with previous assignments, Java users may use EJML\footnote{\url{https://ejml.org}} and C++ users Eigen\footnote{\url{http://eigen.tuxfamily.org/}}. Details below. 
+%
+(As usual, Python users have numpy; Octave users have built-in matrix support.)
+%
+\begin{description}
+\item[Java] EJML is a pure Java linear algebra package with three interfaces. We strongly recommend using the SimpleMatrix interface. Autolab will use EJML version 3.3. The commands above demonstrate how we will call you code. The classpath inclusion \lstinline{-cp "./lib/ejml-v0.33-libs/*:./"} will ensure that all the EJML jars are on the classpath as well as your code. 
+\item[C++] Eigen is a header-only library, so there is no linking to worry about---just \lstinline{#include} whatever components you need. Autolab will use Eigen version 3.3.4. The commands above demonstrate how we will call you code. The argument \lstinline{-I./lib} will include the \lstinline{lib/Eigen} subdirectory, which contains all the headers. When submitting your code to Autolab, make sure that you call the library using \#include $<$Eigen/Dense$>$, instead of using the local/relative paths you may be using on your system.
+\end{description} 
+We have included the correct versions of EJML/Eigen in the handout.tar for your convenience. Do {\bf not} include EJML or Eigen in your Autolab submission tar; the autograder will ensure that they are in place. 
+\end{notebox}
+    
+\subsection{Autolab Submission}
+
+You must submit a .tar file named {\tt hmm.tar} containing \texttt{learnhmm.\{py|m|java|cpp\}} and \texttt{forwardbackward.\{py|m|java|cpp\}}.
+You can create that file by running:
+\begin{lstlisting}
+tar -cvf hmm.tar learnhmm.{py|m|java|cpp} forwardbackward.{py|m|java|cpp}
+\end{lstlisting}
+from the directory containing your code.
+
+Some additional tips: {\bf DO NOT} compress your files; you are just
+creating a tarball. Do not use tar \texttt{-czvf}.  {\bf DO NOT} put
+the above files in a folder and then tar the folder.  Autolab is case
+sensitive, so observe that all your files should be named in {\bf
+  lowercase}. You must submit this file to the corresponding homework
+link on Autolab. The autograder for Autolab prints out some additional 
+information about the tests that it ran. You can view this output by selecting 
+ "Handin History" from the menu and then clicking one of the scores you 
+ received for a submission. For example on this assignment, among other things, 
+ the autograder will print out which language it detects (e.g. Python, Octave, C++, Java). 
+ 
+ \begin{notebox}
+  {\bf Python3 Users:} Please include a blank file called python3.txt (case-sensitive) in your tar submission and we will execute your submitted program using Python 3 instead of Python 2.7.
+ \end{notebox}
+
+Note: For this assignment, you may make up to 10 submissions to Autolab before the deadline, but only your last submission will be graded.
+   
+
+\end{document}
