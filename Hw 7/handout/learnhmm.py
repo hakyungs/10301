@@ -89,10 +89,25 @@ if __name__ == "__main__" :
     # write outputs
     for row in hmmtrans:
         toPrint = ""
-        for entry in row:
-            toNum = "%.18e"%entry
-            toPrint += " " + toNum
+        for i,entry in enumerate(row):
+            if (i != len(row)-1):
+                toPrint += "%.18e"%entry + " "
+            else :
+                toPrint += "%.18e"%entry
         hmmtrans_out.write(toPrint + "\n")
+
+    for row in hmmemit:
+        toPrint = ""
+        for i,entry in enumerate(row):
+            if (i != len(row)-1):
+                toPrint += "%.18e"%entry + " "
+            else :
+                toPrint += "%.18e"%entry
+        hmmemit_out.write(toPrint + "\n")
+
+    for row in hmmprior:
+        toPrint = "%.18e"%entry
+        hmmprior_out.write(toPrint + "\n")
 
 
     train_input_raw.close()
