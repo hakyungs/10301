@@ -106,7 +106,7 @@ if __name__ == "__main__" :
         hmmemit_out.write(toPrint + "\n")
 
     for row in hmmprior:
-        toPrint = "%.18e"%entry
+        toPrint = "%.18e"%row
         hmmprior_out.write(toPrint + "\n")
 
 
