@@ -41,37 +41,30 @@ def formatData(d,data_type):
 
     return res
 
-#########################################################################
-# Get Alpha & Beta
-#########################################################################
-def getAlpha(sentence,pi,A,B):
-    alpha = []
-    log_likelihood_list = []
-    for t,pair in enumerate(sentence):
-        word_index = pair[0]
-        b_jx = (B.T)[word_index]
-        if (t==0):
-            a_tj = pi.T * b_jx.T
-        else :
-            a_tj = b_jx.T * np.dot(B.T, alpha[t-1].T)
-        alpha.append(a_tj / np.sum(a_tj))
 
-        #update log Likelihood
-        if (t==len(sentence)-1):
-            curr_log_likelihood = np.log(np.sum(a_tj))
-            log_likelihood_list.append(curr_log_likelihood)
-    return alpha,log_likelihood_list
 
-def getBeta(sentence,pi,A,B):
-    beta = []
-    for t in range(len(seq)-1,0,-1):
-        if (t==0):
-            beta.append(np.array([1] * len(pi))) #check
-        else :
-            word_index = sentence[t][0]
-            b_tj = (B.T)[word]
-            beta = [np.dot(A,beta[0].T * b_tj.T)] + beta
-    return beta
+
+
+def forwardbackward(words, word2index, index2word, tag2index, index2tag, prior, trans, emit):
+	alpha = np.zeros((len(words), len(tag2index.keys())))
+	for j in range(0, len(tag2index.keys())):
+		alpha[0][j] = prior[j] * emit[j][word2index[words[0]]]
+	if alpha.shape[0] > 1:
+		alpha[0] /= np.sum(alpha[0])
+	for t in range(1, len(words)):
+		for j in range(0, len(tag2index.keys())):
+			tot = 0.0
+			for k in range(0, len(tag2index.keys())):
+				tot += alpha[t - 1][k] * trans[k][j]
+			alpha[t][j] = emit[j][word2index[words[t]]] * tot
+		if t != len(words) - 1:
+			alpha[t] /= np.sum(alpha[t])
+	log_likelihood = np.log(np.sum(alpha[-1]))
+
+	beta = np.zeros((len(words), len(tag2index.keys())))
+	prob = alpha * beta
+	tags_index = np.argmax(prob, axis = 1)
+	return [index2tag[index] for index in tags_index], log_likelihood
 
 #########################################################################
 # Main Function
@@ -95,88 +88,97 @@ if __name__ == "__main__" :
     predicted_file = open(i7,"w")
     metric_file = open(i8,"w")
 
-
     (index_to_word,word_to_index) = formatData(index_to_word_raw,1)
     (index_to_tag,tag_to_index) = formatData(index_to_tag_raw,1)
-    #hmmprior = formatData(hmmprior_raw,2) #np arr
+    num_word = len(index_to_word.keys())
+    num_tag = len(index_to_tag.keys())
+    hmmprior = formatData(hmmprior_raw,2) #np arr
     # num_tag_index x num_word_index
-    #hmmemit = formatData(hmmemit_raw,3)
+    hmmemit = formatData(hmmemit_raw,3)
      # num_tag_index x num_tag_index
-    #hmmtrans = formatData(hmmtrans_raw,3)
-    hmmprior = np.array([1 for j in range(len(index_to_tag))])
-    hmmtrans = np.array([np.array([1 for i in range(len(index_to_tag))])
-                         for j in range(len(index_to_tag))])
-    hmmemit = np.array([np.array([1 for i in range(len(index_to_word))])
-                        for j in range(len(index_to_tag))])
-
+    hmmtrans = formatData(hmmtrans_raw,3)
 
     test_input = []
     for line in test_input_raw.readlines():
-        tokens = line.strip().split(" ")
-        token_list = []
-        for t in tokens:
-            token = t.split("_")
-            word_idx = word_to_index[token[0]] #saving index of word
-            tag_idx = tag_to_index[token[1]] #saving index of tag
-            token_list.append((word_idx,tag_idx))
-        test_input.append(token_list)
+        tokens = line.strip("\n").split(" ")
+        test_input.append(tokens)
 
-    #########################################################################
-    # Prediction
-    #########################################################################
-
+    #Run
     predictions = []
-    log_likelihood = []
-    num_correct = 0
-    likelihood = 0.0
-
+    cumul_likelihood = 0.0
+    total_tags = 0
+    correct = 0
+    count = 0
 
     for sentence in test_input:
+        words,labels = [],[]
+        prediction_list = []
+        for pair in sentence:
+            words.append(pair.split("_")[0])
+            labels.append(pair.split("_")[1])
 
-        alpha,log_likelihood_list = getAlpha(sentence,hmmprior,hmmtrans,hmmemit)
-        beta = getBeta(sentence,hmmemit,hmmtrans,index_to_tag)
-        for row in alpha:
-            row /= np.sum(row)
-        for row in beta:
-            row /= np.sum(row)
+        # GET ALPHA
+        alpha = np.zeros((len(words),num_tag))
+        for j in range(0,num_tag):
+            alpha[0][j] = hmmprior[j] * hmmemit[j][word_to_index[words[0]]]
 
-        for t,pair in enumerate(sentence):
-            tag_res = []
-            tag_index = pair[1]
-            a_t,b_t = alpha[t],beta[t]
-            p_t = a_t * b_t
+        if (alpha.shape[0] > 1):
+            alpha[0] /= np.sum(alpha[0])
+        for t in range(1,len(words)):
+            for i in range(0,num_tag):
+                tmp = 0.0
+                for k in range(0,num_tag):
+                    tmp += alpha[t-1][k] * hmmtrans[k][i]
+                alpha[t][i] = hmmemit[i][word_to_index[words[t]]] * tmp
+            if (t < len(words)-1):
+                alpha[t] /= np.sum(alpha[t])
 
-            #find argmax
-            p_max = None
-            max_index = None
-            for i in range(len(p_t)):
-                if (p_max == None or p_max < p_t[i]):
-                    p_max = p_t[i]
-                    max_index = i
-            tag_res.append((pair[0],max_index))
-            if (max_index == tag_index):
-                num_correct += 1
-        predictions.append(tag_res)
+        log_likelihood = np.log(np.sum(alpha[-1]))
 
-    #get average log_likelihood
-    avg_log_likelihood = sum(log_likelihood_list ) / len(log_likelihood_list)
-    accuracy = num_correct / total
+        # GET BETA
+    	beta = np.zeros((len(words), num_tag))
 
-    # write output
+        tag_list = []
+        for t in range(len(sentence)):
+            count += 1
+            curr_tag = labels[t]
+            p = alpha[t] * beta[t]
+
+            max_prob = None
+            max_i = None
+            for i in range(len(p)):
+                if (max_i == None or p[i] > max_prob) :
+                    max_prob = p[i]
+                    max_i = i
+
+            if (max_i == curr_tag):
+                correct += 1
+            tag_list.append((words[t], max_i))
+        predictions.append(tag_list)
+        cumul_likelihood += log_likelihood
+        total_tags += len(tag_list)
+
+        for i in range(len(tag_list)):
+            if (index_to_tag[tag_list[i][1]] == labels[i]):
+                correct += 1
+
+    avg_log_likelihood = cumul_likelihood / float(len(test_input))
+    accuracy = float(correct) / float(total_tags)
+
+    metric_file.write("Average Log-Likelihood: " + str(avg_log_likelihood) + "\n")
+    metric_file.write("Accuracy: " + str(accuracy))
+
     for prediction in predictions:
         toPrint = ""
-        for pair in prediction:
-            toPrint += index_to_word[pair[0]] + "_" + index_to_tag[tag[1]] + " "
+        for t in prediction:
+            toPrint += t[0] + "_" + index_to_tag[t[1]] + " "
         predicted_file.write(toPrint + "\n")
-
-    metric_file.write("Average Log-Likelihood: " + str(log_likelihood) +
-                      "\nAccuracy: " + str(accuracy))
 
     test_input_raw.close()
     index_to_word_raw.close()
     index_to_tag_raw.close()
-    hmmprior_out.close()
-    hmmemit_out.close()
-    hmmtrans_out.close()
+    hmmprior_raw.close()
+    hmmemit_raw.close()
+    hmmtrans_raw.close()
     predicted_file.close()
     metric_file.close()
